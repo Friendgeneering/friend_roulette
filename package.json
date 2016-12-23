@@ -53,8 +53,11 @@
     "whatwg-fetch": "1.0.0"
   },
   "dependencies": {
+    "body-parser": "^1.15.2",
+    "cors": "^2.8.1",
     "eslint-config-airbnb-base": "^11.0.0",
     "express": "^4.14.0",
+    "express-validator": "^3.1.1",
     "morgan": "^1.7.0",
     "react": "^15.4.1",
     "react-dom": "^15.4.1"
