@@ -6,7 +6,7 @@
  */
 
 const options = {
-  isArray: (value) => (Array.isArray(value)),
+  isArray: value => Array.isArray(value),
 };
 
 export default options;
