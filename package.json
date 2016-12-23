@@ -60,7 +60,8 @@
     "express-validator": "^3.1.1",
     "morgan": "^1.7.0",
     "react": "^15.4.1",
-    "react-dom": "^15.4.1"
+    "react-dom": "^15.4.1",
+    "sequelize": "^3.28.0"
   },
   "scripts": {
     "start": "node scripts/start.js",
