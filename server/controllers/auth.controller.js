@@ -18,10 +18,26 @@ export const signIn = async (req, res) => {
   if (await isRequestInvalid(req, res)) {
     return;
   }
-
-  res.json({
-    success: true,
-  });
+  try {
+    const { username, password } = req.body;
+    const user = await User.find({ where: { username } });
+    if (await user.checkPassword(password, user.password)) {
+      res.json({
+        success: true,
+        token  : await user.getToken(),
+      });
+      return;
+    }
+    res.status(401).json({
+      success: false,
+      err    : 'invalid password',
+    });
+  } catch (e) {
+    res.status(500).json({
+      success: false,
+      err    : e.toString(),
+    });
+  }
 };
 
 /**
@@ -60,7 +76,6 @@ export const signUp = async (req, res) => {
       });
       return;
     }
-
     user = await User.create({
       username,
       password,
@@ -69,7 +84,6 @@ export const signUp = async (req, res) => {
       location,
       gender,
     });
-
     res.json({
       success: true,
       token  : await user.getToken(),
