@@ -1,11 +1,14 @@
 import Sequelize from 'sequelize';
 import { promisify } from 'bluebird';
 import { hash, compare } from 'bcrypt';
+import { sign } from 'jsonwebtoken';
 
 import sequelize from '../db';
+import { jwtSecret } from '../config';
 
 const hashPassword = promisify(hash);
 const comparePassword = promisify(compare);
+const signToken = promisify(sign);
 
 const User = sequelize.define('users', {
   username: {
@@ -38,7 +41,7 @@ const User = sequelize.define('users', {
   gender: {
     type     : Sequelize.STRING,
     allowNull: false,
-  }
+  },
 }, {
   /**
    *
@@ -74,6 +77,25 @@ const User = sequelize.define('users', {
      *  @url https://www.npmjs.com/package/bcrypt#to-check-a-password
      */
     checkPassword: (inputPass, hashedPass) => comparePassword(inputPass, hashedPass),
+
+    /**
+     *
+     *  getToken: Promise<string>
+     */
+    getToken: async function() {
+      const { id, email } = this;
+      try {
+        const token = await signToken({
+          id,
+          email,
+        }, jwtSecret, {
+          expiresIn: '7d',
+        });
+        return token;
+      } catch (e) {
+        throw new Error('error generating token');
+      }
+    },
   },
 });
 
