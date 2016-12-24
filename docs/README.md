@@ -4,7 +4,7 @@
 
 ### Authentication
 
-**/api/auth/signIn**
+**`/api/auth/signIn`**
 
 ```plaintext
 {POST}
@@ -22,11 +22,12 @@
       token ?: STRING
       err   ?: STRING
     Codes
+      400: validation errors
       401: invalid username or password
       500: server error
 ```
 
-**/api/auth/signUp**
+**`/api/auth/signUp`**
 
 ```plaintext
 {POST}
@@ -45,9 +46,11 @@
   Response
     JSON
       success : BOOL
+      token  ?: STRING
       message?: STRING
       err    ?: STRING
     Codes
+      400: validation errors
       409: username already exists
       500: server error
 ```
