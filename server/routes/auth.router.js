@@ -7,7 +7,7 @@ import {
 
 const authRouter = Router();
 
-authRouter.post('/signin', signIn);
-authRouter.post('/signup', signUp);
+authRouter.post('/signIn', signIn);
+authRouter.post('/signUp', signUp);
 
 export default authRouter;
