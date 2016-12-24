@@ -8,17 +8,20 @@
 
 ```plaintext
 {POST}
-  Query:
-  Params:
-  Body:
+  Query
+
+  Params
+
+  Body
     username: STRING
     password: STRING
-  Response:
-    JSON:
+
+  Response
+    JSON
       success: BOOL
       token ?: STRING
       err   ?: STRING
-    Codes:
+    Codes
       401: invalid username or password
       500: server error
 ```
@@ -27,21 +30,24 @@
 
 ```plaintext
 {POST}
-  Query:
-  Params:
-  Body:
+  Query
+
+  Params
+
+  Body
     username: STRING
     password: STRING
     email   : STRING
     age     : INT
     location: STRING
-    gender  : STRING,
-  Response:
-    JSON:
+    gender  : STRING
+
+  Response
+    JSON
       success : BOOL
       message?: STRING
       err    ?: STRING
-    Codes:
+    Codes
       409: username already exists
       500: server error
 ```
