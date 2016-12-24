@@ -8,9 +8,12 @@ const Room = sequelize.define('rooms', {
     allowNull: false,
     unique   : true,
   },
+  socketRoom: {
+    type  : Sequelize.STRING,
+    unique: true,
+  },
   location: {
-    type     : Sequelize.STRING,
-    allowNull: false,
+    type: Sequelize.STRING,
   },
   minAge: {
     type: Sequelize.INTEGER,
