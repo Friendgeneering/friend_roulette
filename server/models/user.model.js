@@ -38,7 +38,7 @@ const User = sequelize.define('users', {
   gender: {
     type     : Sequelize.STRING,
     allowNull: false,
-  }
+  },
 }, {
   /**
    *
