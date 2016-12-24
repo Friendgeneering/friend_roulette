@@ -20,6 +20,7 @@ module.exports = {
     "no-param-reassign": "off",
     "consistent-return": "off",
     "arrow-body-style": "off",
-    "object-shorthand": "off"
+    "object-shorthand": "off",
+    "func-names": "off"
   }
 }

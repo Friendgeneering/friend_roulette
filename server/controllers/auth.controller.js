@@ -6,8 +6,13 @@ import { User } from '../models';
  *  @route /api/auth/signIn
  *
  *  @method {POST}
+ *
+ *  @body {
+ *    username: STRING,
+ *    password: STRING
+ *  }
  */
-const signIn = async (req, res) => {
+export const signIn = async (req, res) => {
   req.checkBody('username', 'Please provide a username').notEmpty().isAlpha();
   req.checkBody('password', 'Please provide a password').notEmpty().isAlpha();
   if (await isRequestInvalid(req, res)) {
@@ -24,8 +29,17 @@ const signIn = async (req, res) => {
  *  @route /api/auth/signUp
  *
  *  @method {POST}
+ *
+ *  @body {
+ *    username: STRING,
+ *    password: STRING,
+ *    email   : STRING,
+ *    age     : INT,
+ *    location: STRING,
+ *    gender  : STRING,
+ *  }
  */
-const signUp = async (req, res) => {
+export const signUp = async (req, res) => {
   req.checkBody('username', 'Please provide a username').notEmpty().isAlpha();
   req.checkBody('password', 'Please provide a password').notEmpty().isAlpha();
   req.checkBody('email', 'Please provide an email address').notEmpty().isEmail();
@@ -56,19 +70,13 @@ const signUp = async (req, res) => {
       gender,
     });
 
-    console.log('user = ', user.dataValues);
-
     res.json({
       success: true,
+      token  : await user.getToken(),
     });
   } catch (e) {
     res.status(500).json({
       err: e.toString(),
     });
   }
-};
-
-export {
-  signIn,
-  signUp,
 };
