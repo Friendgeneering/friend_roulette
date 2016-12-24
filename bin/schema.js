@@ -30,7 +30,7 @@ try {
  *  the export statements within server/models/index.js
  * 
  */
-var sequelize = require('../server/db/db').default;
+var sequelize = require('../server/db').default;
 require('../server/models/');
 
 var force = process.argv[2] === 'force';
