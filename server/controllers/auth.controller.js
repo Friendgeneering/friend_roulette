@@ -21,7 +21,7 @@ export const signIn = async (req, res) => {
   try {
     const { username, password } = req.body;
     const user = await User.find({ where: { username } });
-    if (await user.checkPassword(password, user.password)) {
+    if (user && await user.checkPassword(password, user.password)) {
       res.json({
         success: true,
         token  : await user.getToken(),
@@ -30,7 +30,7 @@ export const signIn = async (req, res) => {
     }
     res.status(401).json({
       success: false,
-      err    : 'invalid password',
+      err    : 'invalid username or password',
     });
   } catch (e) {
     res.status(500).json({
@@ -70,7 +70,7 @@ export const signUp = async (req, res) => {
     const { username, password, email, age, location, gender } = req.body;
     let user = await User.findOne({ where: { username } });
     if (user) {
-      res.status(400).json({
+      res.status(409).json({
         success: false,
         err    : 'username already exists',
       });
