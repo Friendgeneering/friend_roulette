@@ -22,6 +22,7 @@
       token ?: STRING
       err   ?: STRING
     Codes
+      200: success
       400: validation errors
       401: invalid username or password
       500: server error
@@ -50,6 +51,7 @@
       message?: STRING
       err    ?: STRING
     Codes
+      200: success
       400: validation errors
       409: username already exists
       500: server error
