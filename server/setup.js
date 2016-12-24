@@ -3,7 +3,7 @@ import expressValidator from 'express-validator';
 import bodyParser from 'body-parser';
 import { each } from 'lodash';
 
-import customValidators from './services/requestValidators';
+import customValidators from './services/validation';
 import routes from './routes';
 
 /**
