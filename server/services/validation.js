@@ -25,5 +25,10 @@ export const isRequestInvalid = async (req, res) => {
  *  @url https://github.com/ctavan/express-validator
  */
 export const customValidators = {
-  isArray: value => Array.isArray(value),
+  isArray : value => Array.isArray(value),
+  isGender: (value) => {
+    return !!value && ['male', 'female', 'any'].reduce((accum, gender) => {
+      return accum || gender === value.toLowerCase();
+    }, false);
+  },
 };
