@@ -90,7 +90,8 @@ export const signUp = async (req, res) => {
     });
   } catch (e) {
     res.status(500).json({
-      err: e.toString(),
+      success: false,
+      err    : e.toString(),
     });
   }
 };
