@@ -28,6 +28,7 @@ var isInteractive = process.stdout.isTTY;
 
 // Warn and crash if required files are missing
 if (!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {
+  console.log('exit')
   process.exit(1);
 }
 
