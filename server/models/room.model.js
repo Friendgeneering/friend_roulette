@@ -1,4 +1,5 @@
 import Sequelize from 'sequelize';
+import { generate as generateId } from 'shortid';
 
 import sequelize from '../db';
 
@@ -8,9 +9,12 @@ const Room = sequelize.define('rooms', {
     allowNull: false,
     unique   : true,
   },
+  socketRoom: {
+    type  : Sequelize.STRING,
+    unique: true,
+  },
   location: {
-    type     : Sequelize.STRING,
-    allowNull: false,
+    type: Sequelize.STRING,
   },
   minAge: {
     type: Sequelize.INTEGER,
@@ -20,6 +24,18 @@ const Room = sequelize.define('rooms', {
   },
   gender: {
     type: Sequelize.STRING,
+  },
+}, {
+  hooks: {
+    beforeValidate: async (room) => {
+      try {
+        room.name = (`${room.location}-${generateId()}`).replace(/\s/g, '');
+        console.log('room = ', room.toJSON());
+        return sequelize.Promise.resolve(room);
+      } catch (e) {
+        return sequelize.Promise.reject(e);
+      }
+    },
   },
 });
 

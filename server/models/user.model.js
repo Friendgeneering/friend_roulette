@@ -61,8 +61,8 @@ const User = sequelize.define('users', {
       try {
         user.password = await hashPassword(user.password, 2);
         return sequelize.Promise.resolve(user);
-      } catch (err) {
-        return sequelize.Promise.reject(err);
+      } catch (e) {
+        return sequelize.Promise.reject(e);
       }
     },
   },
