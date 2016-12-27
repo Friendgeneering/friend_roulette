@@ -1,0 +1,37 @@
+.auth-container {
+	margin: auto;
+	width: 50%;
+}
+
+//geosuggest styles
+.geosuggest__suggests--hidden {
+  max-height: 0;
+  overflow: hidden;
+  border-width: 0;
+}
+
+.geosuggest__suggests {
+	list-style-type: none;
+}
+
+.geosuggest__input {
+	position: relative;
+    z-index: 2;
+    float: left;
+    width: 100%;
+    margin-bottom: 0;
+}
+
+.geosuggest__item--active {
+  background: #267dc0;
+  color: #fff;
+}
+
+.geosuggest__item:hover {
+	background: #eee;
+	cursor: pointer;
+}
+
+.geosuggest__suggests-wrapper {
+	border: 1px solid #eee;
+}
