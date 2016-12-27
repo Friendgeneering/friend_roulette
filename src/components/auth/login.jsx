@@ -1,23 +1,39 @@
 import React, { Component } from 'react'
+import Geosuggest from 'react-geosuggest'
 
 import { base } from '../base'
-import { monthsAndDays, getNumOfDays, birthYears } from './util'
+import { monthsAndDays, getNumOfDays, birthYears, getCityResults } from './util'
 
+
+//On form submit, set cookies to keep the value of inputs on refresh?
 
 export default class Login extends Component {
 	constructor(props) {
 		super(props)
 
 		this.state = {
+			username: '',
+			password: '',
+			confirmPassword: '',
+			gender: '',
+			location: '',
 			birthday: {
 				month: 'January',
 				day: 1,
 				year: 1995
-			}
+			},
+			cityQueryResults: []
 		}
 
-		this.renderDays = this.renderDays.bind(this)
+		this.handleChange = this.handleChange.bind(this)
+		this.onSuggestSelect = this.onSuggestSelect.bind(this)
 		this.handleDateChange = this.handleDateChange.bind(this)
+	}
+
+	handleChange(e, type) {
+		let newState = this.state
+		newState[type] = e.target.value
+		this.setState({...this.state, ...newState})
 	}
 
 	handleDateChange(e, type) {
@@ -27,16 +43,16 @@ export default class Login extends Component {
 		this.setState({...this.state, ...newState})
 	}
 
-	renderDays() {
-		const { month } = this.state.birthday
-		const numOfdays = getNumOfDays(monthsAndDays[month])
-		return numOfdays.map(day => <option key={day} value={day}>{day}</option>)
+	onSuggestSelect(suggest) {
+		console.log(suggest)
+		this.setState({ location: suggest.label })
 	}
 
 	render() {
-
+		console.log('state', this.state)
 		const { month, day, year } = this.state.birthday
-		let allBirthYears = birthYears()
+		const numOfdays = getNumOfDays(monthsAndDays[month])
+		const allBirthYears = birthYears()
 
 		return (
 			<div>
@@ -52,11 +68,11 @@ export default class Login extends Component {
 				    <div role="tabpanel" className="tab-pane active" id="login">
 				    	<div className="input-group">
   							<span className="input-group-addon"><span className="glyphicon glyphicon-user"></span></span>
- 							<input type="text" className="form-control" placeholder="Username" />
+ 							<input type="text" onChange={(e) => this.handleChange(e, 'username')} className="form-control" placeholder="Username" />
 						</div>
 						<div className="input-group">
   							<span className="input-group-addon"><span className="glyphicon glyphicon-option-horizontal"></span></span>
- 							<input type="password" className="form-control" placeholder="Password" />
+ 							<input type="password" onChange={(e) => this.handleChange(e, 'password')} className="form-control" placeholder="Password" />
 						</div>
 						<button type="button" className="btn btn-primary">Submit</button>
 				    </div>
@@ -65,15 +81,15 @@ export default class Login extends Component {
 				    <div role="tabpanel" className="tab-pane" id="signup">
 				    	<div className="input-group">
   							<span className="input-group-addon"><span className="glyphicon glyphicon-user"></span></span>
- 							<input type="text" className="form-control" placeholder="Username" />
+ 							<input type="text" onChange={(e) => this.handleChange(e, 'username')} className="form-control" placeholder="Username" />
 						</div>
 						<div className="input-group">
   							<span className="input-group-addon"><span className="glyphicon glyphicon-option-horizontal"></span></span>
- 							<input type="password" className="form-control" placeholder="Password" />
+ 							<input type="password" onChange={(e) => this.handleChange(e, 'password')} className="form-control" placeholder="Password" />
 						</div>
 						<div className="input-group">
   							<span className="input-group-addon"><span className="glyphicon glyphicon-option-horizontal"></span></span>
- 							<input type="password" className="form-control" placeholder="Confirm Password" />
+ 							<input type="password" onChange={(e) => this.handleChange(e, 'confirmPassword')} className="form-control" placeholder="Confirm Password" />
 						</div>
 						<div className="input-group">
   							<span className="input-group-addon">Birthday </span>
@@ -84,7 +100,7 @@ export default class Login extends Component {
 							</div>
 							<div className="col-xs-3">
 							<select  className="form-control" name="day" value={day} onChange={(e) => this.handleDateChange(e, 'day')}>
-  								{this.renderDays()}
+  								{numOfdays.map(day => <option key={day} value={day}>{day}</option>)}
 							</select>
 							</div>
 							<div className="col-xs-3">
@@ -96,18 +112,25 @@ export default class Login extends Component {
 						<div className="input-group">
 							<span className="input-group-addon">Gender</span>
   							<label className="radio-inline">
-						      <input type="radio" name="optradio" />Male
+						      <input type="radio" value="Male" onChange={(e) => this.handleChange(e, 'gender')} />Male
 						    </label>
 						    <label className="radio-inline">
-						      <input type="radio" name="optradio" />Female
+						      <input type="radio" value="Female" onChange={(e) => this.handleChange(e, 'gender')}  />Female
 						    </label>
 						    <label className="radio-inline">
-						      <input type="radio" name="optradio" />Other
+						      <input type="radio" value="Other" onChange={(e) => this.handleChange(e, 'gender')} />Other
 						    </label>
 						</div>
 						<div className="input-group">
   							<span className="input-group-addon"><span className="glyphicon glyphicon-map-marker"></span></span>
- 							<input type="password" className="form-control" placeholder="Location" />
+ 							<Geosuggest
+					          ref={el=>this._geoSuggest=el}
+					          country='us'
+					          inputClassName="form-control"
+					          types={['(cities)']}
+					          onSuggestSelect={this.onSuggestSelect}
+					          onSuggestNoResults={this.onSuggestNoResults}
+					      	 />
 						</div>
 						<button type="submit" className="btn btn-primary">Submit</button>
 				    </div>

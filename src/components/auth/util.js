@@ -1,3 +1,4 @@
+import axios from 'axios'
 //Helper object containing month and corresponding # of days
 
 export const monthsAndDays = {
@@ -31,4 +32,16 @@ export const birthYears = () => {
 		result.push(i)
 	}
 	return result
+}
+
+export const getCityResults = function(searchTerm) {
+
+	const query = `http://gd.geobytes.com/AutoCompleteCity?callback=?q=${searchTerm}`
+
+	axios.get(query).then(results => {
+		console.log('query results', results)
+	})
+	.catch(err => console.log(err))
+
+
 }
