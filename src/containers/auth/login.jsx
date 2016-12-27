@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
 import Geosuggest from 'react-geosuggest'
 
-import { base } from '../base'
-import { monthsAndDays, getNumOfDays, birthYears, getCityResults } from './util'
+import { base } from '../../components/base'
+import { monthsAndDays, getNumOfDays, birthYears } from './util'
 
 
 //On form submit, set cookies to keep the value of inputs on refresh?
@@ -21,10 +21,12 @@ export default class Login extends Component {
 				month: 'January',
 				day: 1,
 				year: 1995
-			},
-			cityQueryResults: []
+			}
 		}
 
+
+		this.handleLogin = this.handleLogin.bind(this)
+		this.handleSignUp = this.handleSignUp.bind(this)
 		this.handleChange = this.handleChange.bind(this)
 		this.onSuggestSelect = this.onSuggestSelect.bind(this)
 		this.handleDateChange = this.handleDateChange.bind(this)
@@ -44,12 +46,19 @@ export default class Login extends Component {
 	}
 
 	onSuggestSelect(suggest) {
-		console.log(suggest)
 		this.setState({ location: suggest.label })
 	}
 
+	handleLogin() {
+		
+
+	}
+
+	handleSignUp() {
+
+	}
+
 	render() {
-		console.log('state', this.state)
 		const { month, day, year } = this.state.birthday
 		const numOfdays = getNumOfDays(monthsAndDays[month])
 		const allBirthYears = birthYears()
@@ -74,7 +83,7 @@ export default class Login extends Component {
   							<span className="input-group-addon"><span className="glyphicon glyphicon-option-horizontal"></span></span>
  							<input type="password" onChange={(e) => this.handleChange(e, 'password')} className="form-control" placeholder="Password" />
 						</div>
-						<button type="button" className="btn btn-primary">Submit</button>
+						<button type="button" className="btn btn-primary" onSubmit={this.handleLogin}>Submit</button>
 				    </div>
 
 			{/*Signup Panel*/}
@@ -132,7 +141,7 @@ export default class Login extends Component {
 					          onSuggestNoResults={this.onSuggestNoResults}
 					      	 />
 						</div>
-						<button type="submit" className="btn btn-primary">Submit</button>
+						<button type="submit" onSubmit={this.handleSignUp} className="btn btn-primary">Submit</button>
 				    </div>
 				</div>
 			</div>
