@@ -2,7 +2,7 @@ import { Server } from 'http';
 import Express from 'express';
 import Io from 'socket.io';
 
-import initialize from './setup';
+import initialize from './initialize';
 
 const app = Express();
 const server = Server(app);
@@ -16,7 +16,7 @@ const PORT = process.env.PORT || 3001;
     app,
     io
   });
-  
+
   server.listen(PORT);
   console.log(`app listening on port ${PORT}`);
 })();

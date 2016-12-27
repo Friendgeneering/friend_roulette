@@ -4,6 +4,7 @@ import bodyParser from 'body-parser';
 import { each } from 'lodash';
 
 import sequelize from './db';
+import initSockets from './socket';
 import { customValidators } from './services/validation';
 import routes from './routes';
 
@@ -11,14 +12,14 @@ import routes from './routes';
  *
  *  initialize
  *
- *  @param {OBJECT} options object containing:
+ *  @param {OBJECT} options - contains:
  *    - express instance
  *    - server instance
  *    - socket.io server instance
  *
  *  Sets up the express instance with middleware functions
  */
-const initialize = async ({ app }) => {
+const initialize = async ({ app, io }) => {
   try {
     // express standards
     app.use(bodyParser.json());
@@ -30,6 +31,9 @@ const initialize = async ({ app }) => {
     each(routes, (controller, route) => {
       app.use(route, controller);
     });
+
+    // setup sockets
+    initSockets(io);
 
     await sequelize.authenticate();
   } catch (err) {
