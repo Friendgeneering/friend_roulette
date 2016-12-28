@@ -1,3 +1,4 @@
+import _ from 'lodash'
 //Helper object containing month and corresponding # of days
 
 export const monthsAndDays = {
@@ -31,4 +32,10 @@ export const birthYears = () => {
 		result.push(i)
 	}
 	return result
+}
+
+export const hasValidInputs = (currState) => {
+	let keys = Object.keys(currState)
+	let isValid = _.every(keys, item => currState[item].length > 0)
+	return isValid
 }

@@ -1,6 +1,6 @@
 
 
-const INITIAL_STATE = { user: {}, validation: {} }
+const INITIAL_STATE = { user: {}, sucessfulLogin: false, error: '' }
 
 export default function(state = INITIAL_STATE, action) {
 	switch(action.type) {
