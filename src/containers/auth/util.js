@@ -1,3 +1,4 @@
+import _ from 'lodash'
 //Helper object containing month and corresponding # of days
 
 export const monthsAndDays = {
@@ -31,4 +32,11 @@ export const birthYears = () => {
 		result.push(i)
 	}
 	return result
+}
+
+export const validateSignUp = (state) => {
+	let values = [...Object.values(state)]
+	values.pop() //Deletes birthday Object so length can be validated
+	console.log('values', values)
+	return _.every(values, item => item.length > 0)
 }
