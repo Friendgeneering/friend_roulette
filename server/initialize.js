@@ -4,7 +4,7 @@ import bodyParser from 'body-parser';
 import { each } from 'lodash';
 
 import sequelize from './db';
-import initSockets from './socket';
+import { initSockets } from './socket';
 import { customValidators } from './services/validation';
 import routes from './routes';
 

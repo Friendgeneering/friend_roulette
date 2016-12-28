@@ -1,7 +1,16 @@
 import { verify } from 'jsonwebtoken';
+import { each } from 'lodash';
 
 import { jwtSecret } from '../config';
-import { Room } from '../models';
+import listeners from './listeners';
+
+/**
+ *
+ *  This weak map holds all active socket client instances & their user data
+ *
+ *  @url {https://goo.gl/nKzWJB}
+ */
+export const connections = new WeakMap();
 
 /**
  *
@@ -11,8 +20,7 @@ import { Room } from '../models';
  *
  *  Sets up the socket server instance with middleware & namespacing
  */
-const initSockets = (io) => {
-  console.log('initializing socket server');
+export const initSockets = (io) => {
   /**
    *
    *  Authentication middleware
@@ -25,7 +33,8 @@ const initSockets = (io) => {
       const { token } = socket.handshake.query;
       const decoded = await verify(token, jwtSecret);
       if (decoded) {
-        console.log('decoded = ', decoded);
+        // if authorized, store the socket instance & user data in map:
+        connections.set(socket, decoded);
         return next();
       }
     } catch (e) {
@@ -34,26 +43,12 @@ const initSockets = (io) => {
   });
 
   io.on('connection', (socket) => {
-    socket.on('connectTo', async ({ roomId }) => {
-      try {
-        console.log('roomId = ', roomId);
-        // const userId = (await verify(token, jwtSecret)).id;
-        const room = await Room.findById(roomId);
-        if (room) {
-          console.log('socket joining room.socketRoom = ', room.socketRoom);
-          socket.join(room.socketRoom);
-          return;
-        }
-        socket.emit('err', {
-          err: `room with roomId ${roomId} not found`,
-        });
-      } catch (e) {
-        socket.emit('err', {
-          err: e.toString(),
-        });
-      }
+    /**
+     *
+     *  Event listeners
+     */
+    each(listeners, (listener, listenerName) => {
+      socket.on(listenerName, listener.bind(null, socket));
     });
   });
 };
-
-export default initSockets;
