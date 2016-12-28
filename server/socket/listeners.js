@@ -2,6 +2,7 @@
 
 // import { jwtSecret } from '../config';
 import { Room } from '../models';
+import { connections } from './';
 
 /**
  *
@@ -20,7 +21,7 @@ import { Room } from '../models';
  *  @param {OBJECT} options
  *    - roomId: the room the user wants to join
  */
-const connectTo = async (socket, { roomId }) => {
+export const connectTo = async (socket, { roomId }) => {
   try {
     // const userId = (await verify(token, jwtSecret)).id;
     const room = await Room.findById(roomId);
@@ -38,6 +39,10 @@ const connectTo = async (socket, { roomId }) => {
   }
 };
 
-export default {
-  connectTo,
+/**
+ *
+ *  A disconnect handler
+ */
+export const disconnect = async (socket) => {
+  connections.delete(socket);
 };

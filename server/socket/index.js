@@ -2,7 +2,7 @@ import { verify } from 'jsonwebtoken';
 import { each } from 'lodash';
 
 import { jwtSecret } from '../config';
-import listeners from './listeners';
+import * as listeners from './listeners';
 
 /**
  *
