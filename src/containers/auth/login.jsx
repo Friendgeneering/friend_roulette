@@ -1,10 +1,12 @@
 import React, { Component } from 'react'
 import Geosuggest from 'react-geosuggest'
+import { connect } from 'react-redux'
 
 import { base } from '../../components/base'
 import { monthsAndDays, getNumOfDays, birthYears, validateSignUp } from './util'
+import { loginValidator, signupValidator } from './validators'
 
-export default class Login extends Component {
+class Login extends Component {
 	constructor(props) {
 		super(props)
 
@@ -54,13 +56,18 @@ export default class Login extends Component {
 			this.setState({ ...this.state, ...newState })	
 	}
 
-	handleLogin() {
+	handleLogin(e) {
+		e.preventDefault()
+		let errors = loginValidator(this.state.login)
+		console.log('login errors', errors)
 		
 
 	}
 
-	handleSignUp() {
-
+	handleSignUp(e) {
+		e.preventDefault()
+		let errors = signupValidator(this.state.signup)
+		console.log('signup errors', errors)
 	}
 
 	render() {
@@ -89,78 +96,79 @@ export default class Login extends Component {
 
 					<div className="tab-content">
 						{/*Login Panel*/}
-					    <div role="tabpanel" className="tab-pane active" id="login">
-					    	<div className="input-group">
-	  							<span className="input-group-addon"><span className="glyphicon glyphicon-user"></span></span>
-	 							<input type="text" onChange={(e) => this.handleChange(e, 'login' ,'username')} className="form-control" placeholder="Username" />
+						    <div role="tabpanel" className="tab-pane active" id="login">
+						    	<div className="input-group">
+		  							<span className="input-group-addon"><span className="glyphicon glyphicon-user"></span></span>
+		 							<input type="text" onChange={(e) => this.handleChange(e, 'login' ,'username')} className="form-control" placeholder="Username" />
+								</div>
+								<div className="input-group">
+		  							<span className="input-group-addon"><span className="glyphicon glyphicon-lock"></span></span>
+		 							<input type="password" onChange={(e) => this.handleChange(e, 'login', 'password')} className="form-control" placeholder="Password" />
+								</div>
+						
+							<button type="submit" className="btn btn-primary" disabled={!isValidLogin} onClick={this.handleLogin}>Submit</button>
 							</div>
-							<div className="input-group">
-	  							<span className="input-group-addon"><span className="glyphicon glyphicon-lock"></span></span>
-	 							<input type="password" onChange={(e) => this.handleChange(e, 'login', 'password')} className="form-control" placeholder="Password" />
-							</div>
-							<button type="button" className="btn btn-primary" disabled={!isValidLogin} onSubmit={this.handleLogin}>Submit</button>
-					    </div>
-
+		
 						{/*Signup Panel*/}
 					    <div role="tabpanel" className="tab-pane" id="signup">
-					    	<div className="input-group">
-	  							<span className="input-group-addon"><span className="glyphicon glyphicon-user"></span></span>
-	 							<input type="text" onChange={(e) => this.handleChange(e, 'signup', 'username')} className="form-control" placeholder="Username" />
-							</div>
-							<div className="input-group">
-	  							<span className="input-group-addon"><span className="glyphicon glyphicon-lock"></span></span>
-	 							<input type="password" onChange={(e) => this.handleChange(e, 'signup', 'password')} className="form-control" placeholder="Password" />
-							</div>
-							<div className="input-group">
-	  							<span className="input-group-addon"><span className="glyphicon glyphicon-lock"></span></span>
-	 							<input type="password" onChange={(e) => this.handleChange(e, 'signup', 'confirmPassword')} className="form-control" placeholder="Confirm Password" />
-							</div>
-							<div className="input-group">
-	  							<span className="input-group-addon"><span className="glyphicon glyphicon-envelope"></span></span>
-	 							<input type="email" onChange={(e) => this.handleChange(e, 'signup', 'email')} className="form-control" placeholder="Email" />
-							</div>
-							<div className="input-group">
-	  							<span className="input-group-addon">Birthday </span>
-	  							<div className="col-xs-5">
-	  							<select className="form-control" name="month" value={month} onChange={(e) => this.handleDateChange(e, 'month')}>
-	  								{Object.keys(monthsAndDays).map(month => <option key={month} value={month}>{month}</option>)}
-								</select>
+						    	<div className="input-group">
+		  							<span className="input-group-addon"><span className="glyphicon glyphicon-user"></span></span>
+		 							<input type="text" onChange={(e) => this.handleChange(e, 'signup', 'username')} className="form-control" placeholder="Username" />
 								</div>
-								<div className="col-xs-3">
-								<select  className="form-control" name="day" value={day} onChange={(e) => this.handleDateChange(e, 'day')}>
-	  								{numOfdays.map(day => <option key={day} value={day}>{day}</option>)}
-								</select>
+								<div className="input-group">
+		  							<span className="input-group-addon"><span className="glyphicon glyphicon-lock"></span></span>
+		 							<input type="password" onChange={(e) => this.handleChange(e, 'signup', 'password')} className="form-control" placeholder="Password" />
 								</div>
-								<div className="col-xs-4">
-								<select  className="form-control" name="year" value={year} onChange={(e) => this.handleDateChange(e, 'year')}>
-	  								{allBirthYears.map(year => <option key={year} value={year}>{year}</option>)}
-								</select>
+								<div className="input-group">
+		  							<span className="input-group-addon"><span className="glyphicon glyphicon-lock"></span></span>
+		 							<input type="password" onChange={(e) => this.handleChange(e, 'signup', 'confirmPassword')} className="form-control" placeholder="Confirm Password" />
 								</div>
-							</div>
-							<div className="input-group">
-								<span className="input-group-addon">Gender</span>
-	  							<label className="radio-inline">
-							      <input type="radio" value="Male" onChange={(e) => this.handleChange(e, 'signup', 'gender')} />Male
-							    </label>
-							    <label className="radio-inline">
-							      <input type="radio" value="Female" onChange={(e) => this.handleChange(e, 'signup', 'gender')}  />Female
-							    </label>
-							    <label className="radio-inline">
-							      <input type="radio" value="Other" onChange={(e) => this.handleChange(e, 'signup', 'gender')} />Other
-							    </label>
-							</div>
-							<div className="input-group">
-	  							<span className="input-group-addon"><span className="glyphicon glyphicon-map-marker"></span></span>
-	 							<Geosuggest
-						          ref={el=>this._geoSuggest=el}
-						          country='us'
-						          inputClassName="form-control"
-						          types={['(cities)']}
-						          onSuggestSelect={this.onSuggestSelect}
-						          onSuggestNoResults={this.onSuggestNoResults}
-						      	 />
-							</div>
-							<button type="submit" onSubmit={this.handleSignUp} disabled={!isValidSignup} className="btn btn-primary">Submit</button>
+								<div className="input-group">
+		  							<span className="input-group-addon"><span className="glyphicon glyphicon-envelope"></span></span>
+		 							<input type="email" onChange={(e) => this.handleChange(e, 'signup', 'email')} className="form-control" placeholder="Email" />
+								</div>
+								<div className="input-group">
+		  							<span className="input-group-addon">Birthday </span>
+		  							<div className="col-xs-5">
+		  							<select className="form-control" name="month" value={month} onChange={(e) => this.handleDateChange(e, 'month')}>
+		  								{Object.keys(monthsAndDays).map(month => <option key={month} value={month}>{month}</option>)}
+									</select>
+									</div>
+									<div className="col-xs-3">
+									<select  className="form-control" name="day" value={day} onChange={(e) => this.handleDateChange(e, 'day')}>
+		  								{numOfdays.map(day => <option key={day} value={day}>{day}</option>)}
+									</select>
+									</div>
+									<div className="col-xs-4">
+									<select  className="form-control" name="year" value={year} onChange={(e) => this.handleDateChange(e, 'year')}>
+		  								{allBirthYears.map(year => <option key={year} value={year}>{year}</option>)}
+									</select>
+									</div>
+								</div>
+								<div className="input-group">
+									<span className="input-group-addon">Gender</span>
+		  							<label className="radio-inline">
+								      <input type="radio" value="Male" onChange={(e) => this.handleChange(e, 'signup', 'gender')} />Male
+								    </label>
+								    <label className="radio-inline">
+								      <input type="radio" value="Female" onChange={(e) => this.handleChange(e, 'signup', 'gender')}  />Female
+								    </label>
+								    <label className="radio-inline">
+								      <input type="radio" value="Other" onChange={(e) => this.handleChange(e, 'signup', 'gender')} />Other
+								    </label>
+								</div>
+								<div className="input-group">
+		  							<span className="input-group-addon"><span className="glyphicon glyphicon-map-marker"></span></span>
+		 							<Geosuggest
+							          ref={el=>this._geoSuggest=el}
+							          country='us'
+							          inputClassName="form-control"
+							          types={['(cities)']}
+							          onSuggestSelect={this.onSuggestSelect}
+							          onSuggestNoResults={this.onSuggestNoResults}
+							      	 />
+								</div>
+								<button type="submit" disabled={!isValidSignup} className="btn btn-primary" onClick={this.handleSignUp}>Submit</button>
 					    </div>
 					</div>
 				</div>
@@ -171,3 +179,9 @@ export default class Login extends Component {
 		)
 	}
 }
+
+const mapStateToProps = ({ auth }) => {
+	return { auth }
+}
+
+export default connect(mapStateToProps)(Login)

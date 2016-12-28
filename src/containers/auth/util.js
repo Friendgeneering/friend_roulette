@@ -37,6 +37,5 @@ export const birthYears = () => {
 export const validateSignUp = (state) => {
 	let values = [...Object.values(state)]
 	values.pop() //Deletes birthday Object so length can be validated
-	console.log('values', values)
 	return _.every(values, item => item.length > 0)
 }
