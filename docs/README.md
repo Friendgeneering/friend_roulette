@@ -72,6 +72,11 @@ In order to authenticate a web socket connection, assign the token as a query pa
 import io from 'socket.io';
 
 io.connect(`localhost:3001/?token=${USER_TOKEN}`);
+
+// alternatively:
+io.connect('localhost:3001', { 
+  query: `token=${USER_TOKEN}` 
+});
 ```
 
 If unauthorized, the web socket connection will be rejected.
