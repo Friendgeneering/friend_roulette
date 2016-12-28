@@ -1,6 +1,7 @@
 import { verify } from 'jsonwebtoken';
 
 import { jwtSecret } from '../config';
+import { Room } from '../models';
 
 /**
  *
@@ -10,7 +11,6 @@ import { jwtSecret } from '../config';
  *
  *  Sets up the socket server instance with middleware & namespacing
  */
-
 const initSockets = (io) => {
   console.log('initializing socket server');
   /**
@@ -25,6 +25,7 @@ const initSockets = (io) => {
       const { token } = socket.handshake.query;
       const decoded = await verify(token, jwtSecret);
       if (decoded) {
+        console.log('decoded = ', decoded);
         return next();
       }
     } catch (e) {
@@ -33,8 +34,24 @@ const initSockets = (io) => {
   });
 
   io.on('connection', (socket) => {
-    socket.on('connectTo', ({ roomId }) => {
-      console.log('roomId = ', roomId);
+    socket.on('connectTo', async ({ roomId }) => {
+      try {
+        console.log('roomId = ', roomId);
+        // const userId = (await verify(token, jwtSecret)).id;
+        const room = await Room.findById(roomId);
+        if (room) {
+          console.log('socket joining room.socketRoom = ', room.socketRoom);
+          socket.join(room.socketRoom);
+          return;
+        }
+        socket.emit('err', {
+          err: `room with roomId ${roomId} not found`,
+        });
+      } catch (e) {
+        socket.emit('err', {
+          err: e.toString(),
+        });
+      }
     });
   });
 };
