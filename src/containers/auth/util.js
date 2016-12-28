@@ -34,8 +34,9 @@ export const birthYears = () => {
 	return result
 }
 
-export const hasValidInputs = (currState) => {
-	let keys = Object.keys(currState)
-	let isValid = _.every(keys, item => currState[item].length > 0)
-	return isValid
+export const validateSignUp = (state) => {
+	let values = [...Object.values(state)]
+	values.pop() //Deletes birthday Object so length can be validated
+	console.log('values', values)
+	return _.every(values, item => item.length > 0)
 }
