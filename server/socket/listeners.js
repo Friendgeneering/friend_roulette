@@ -1,5 +1,6 @@
 import { Room } from '../models';
 import { connections } from './';
+import { getClientsInRoom } from './helpers';
 
 /**
  *
@@ -7,7 +8,7 @@ import { connections } from './';
  *  due to a lack of lexical access to the original socket instance.
  *
  *  listeners are set up like this:
- *  socket.on(listenerName, listener.bind(null, socket));
+ *  socket.on(listenerName, listener.bind(null, { io, socket }));
  */
 
 /**
@@ -18,15 +19,29 @@ import { connections } from './';
  *  @param {OBJECT} options
  *    - roomId: the room the user wants to join
  */
-export const connectTo = async (socket, { roomId }) => {
+export const connectTo = async ({ io, socket }, { roomId }) => {
   try {
     const user = connections.get(socket).user;
     const room = await Room.findById(roomId);
     if (room) {
       // join socket to server room
       socket.join(room.socketRoom);
+      
       // store room instance in map for quick access later
       connections.get(socket).room = room;
+
+      // find users in the room
+      const clients = getClientsInRoom({
+        io,
+        roomName: room.socketRoom,
+      });
+      const users = clients.map(socketInstance => connections.get(socketInstance).user);
+
+      // send client a success response with current list of users
+      socket.emit('connectTo.response', {
+        success: true,
+        users  : users.map(userInstance => userInstance.getData),
+      });
       // create join table entry
       return room.addUser(user);
     }
@@ -46,7 +61,7 @@ export const connectTo = async (socket, { roomId }) => {
  *
  *  @param {OBJECT} socket - socket.io client instance
  */
-export const leave = async (socket) => {
+export const leave = async ({ socket }) => {
   try {
     const { user, room } = connections.get(socket);
 
@@ -57,8 +72,13 @@ export const leave = async (socket) => {
       });
     }
 
-    // disconnect from socket room
-    socket.leave(room.socketRoom);
+    // notify socket & all user's in room
+    socket.emit('leave.response', {
+      success: true,
+    });
+    socket.broadcast.to(room.socketRoom).emit('user leave', {
+      user: user.getData,
+    });
 
     // update connections map
     delete connections.get(socket).room;
@@ -67,10 +87,8 @@ export const leave = async (socket) => {
     user.removeRoom(room);
     room.removeUser(user);
 
-    // notify user
-    socket.emit('leave.response', {
-      success: true,
-    });
+    // disconnect from socket room
+    socket.leave(room.socketRoom);
   } catch (e) {
     socket.emit('err.response', {
       err: e.toString(),
@@ -80,8 +98,31 @@ export const leave = async (socket) => {
 
 /**
  *
+ *  message
+ *
+ *  @param {OBJECT} socket - socket.io client instance
+ *
+ *  Incoming message handler, this listener should trigger an emit to
+ *  all other clients in the room the socket belongs to
+ */
+export const newMessage = async ({ socket }, { message }) => {
+  const { room, user } = connections.get(socket);
+  socket.broadcast.to(room.socketRoom).emit('newMessage.response', {
+    message,
+    user: user.getData,
+  });
+};
+
+/**
+ *
  *  A disconnect handler
  */
 export const disconnect = async (socket) => {
+  const { user, room } = connections.get(socket);
+  // if the user is in a room, remove the association in DB
+  if (room) {
+    user.removeRoom(room);
+    room.removeUser(user);
+  }
   connections.delete(socket);
 };

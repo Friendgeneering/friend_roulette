@@ -1,7 +1,7 @@
 import { verify } from 'jsonwebtoken';
 import { each } from 'lodash';
 
-import User from '../models';
+import { User } from '../models';
 import { jwtSecret } from '../config';
 import * as listeners from './listeners';
 
@@ -40,11 +40,13 @@ export const initSockets = (io) => {
           connections.set(socket, {
             user,
           });
+          console.log('socket connected');
           return next();
         }
         throw new Error('user not found');
       }
     } catch (e) {
+      console.log('e = ', e.toString());
       return next(new Error(`Invalid token. Err = ${e.toString()}`));
     }
   });
@@ -55,7 +57,7 @@ export const initSockets = (io) => {
      *  Event listeners
      */
     each(listeners, (listener, listenerName) => {
-      socket.on(listenerName, listener.bind(null, socket));
+      socket.on(listenerName, listener.bind(null, { io, socket }));
     });
   });
 };
