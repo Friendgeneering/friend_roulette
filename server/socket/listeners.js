@@ -20,6 +20,12 @@ import { getClientsInRoom } from './helpers';
  *    - roomId: the room the user wants to join
  */
 export const connectTo = async ({ io, socket }, { roomId }) => {
+  if (!roomId) {
+    socket.emit('connectTo.response', {
+      success: false,
+      err    : 'please provide a roomId',
+    });
+  }
   try {
     const user = connections.get(socket).user;
     const room = await Room.findById(roomId);
@@ -45,7 +51,7 @@ export const connectTo = async ({ io, socket }, { roomId }) => {
       // create join table entry
       return room.addUser(user);
     }
-    socket.emit('err', {
+    socket.emit('connectTo.response', {
       err: `room with roomId ${roomId} not found`,
     });
   } catch (e) {
