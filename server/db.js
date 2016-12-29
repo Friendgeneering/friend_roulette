@@ -1,6 +1,14 @@
 import Sequelize from 'sequelize';
-// import { dbConfig } from './config';
+import { dbConfig } from './config';
 
-const sequelize = new Sequelize('postgres://typkrlvq:Kp7Xp0rpiwwEx1TkfWJMbU6Y6QYeM0-o@elmer.db.elephantsql.com:5432/typkrlvq');
+const sequelize = new Sequelize(
+  dbConfig.database,
+  dbConfig.username,
+  dbConfig.password,
+  {
+    host   : dbConfig.hostname,
+    dialect: 'mysql',
+  },
+);
 
 export default sequelize;
