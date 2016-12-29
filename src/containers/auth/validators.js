@@ -62,8 +62,7 @@ export const signupValidator = (user) => {
 	let signupErrors = { 'hasErrors': false,
 						'Username': [],
 						'Password': [],
-						'Email': [],
-						'Birthday': []
+						'Email': []
 	 				  }
 
 	let updatedSignupErrors = validateUsername(user.username, signupErrors)
@@ -81,16 +80,6 @@ export const signupValidator = (user) => {
 	if(!validEmail) {
 		allerrors['hasErrors'] = true
 		allerrors['Email'].push('Please enter a valid email')
-	}
-
-	//Check that the user is over 18
-	let date = new Date()
-	let currYear = date.getFullYear()
-	let userAge = currYear - user.birthday.year
-
-	if(userAge < 18) {
-		allerrors['hasErrors'] = true
-		allerrors['Birthday'].push('You must be over 18 to sign up')
 	}
 
 	return allerrors

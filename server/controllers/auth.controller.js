@@ -13,8 +13,8 @@ import { User } from '../models';
  *  }
  */
 export const signIn = async (req, res) => {
-  req.checkBody('username', 'Please provide a username').notEmpty().isAlpha();
-  req.checkBody('password', 'Please provide a password').notEmpty().isAlpha();
+  req.checkBody('username', 'Please provide a username').notEmpty();
+  req.checkBody('password', 'Please provide a password').notEmpty();
   if (await isRequestInvalid(req, res)) {
     return;
   }
@@ -56,8 +56,8 @@ export const signIn = async (req, res) => {
  *  }
  */
 export const signUp = async (req, res) => {
-  req.checkBody('username', 'Please provide a username').notEmpty().isAlpha();
-  req.checkBody('password', 'Please provide a password').notEmpty().isAlpha();
+  req.checkBody('username', 'Please provide a username').notEmpty();
+  req.checkBody('password', 'Please provide a password').notEmpty();
   req.checkBody('email', 'Please provide an email address').notEmpty().isEmail();
   req.checkBody('age', 'Please provide an age').notEmpty().isInt();
   req.checkBody('location', 'Please provide a location').notEmpty();

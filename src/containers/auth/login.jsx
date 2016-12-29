@@ -3,8 +3,9 @@ import Geosuggest from 'react-geosuggest'
 import { connect } from 'react-redux'
 
 import { base } from '../../components/base'
-import { monthsAndDays, getNumOfDays, birthYears, validateSignUp } from './util'
+import { possibleAges, validateSignUp } from './util'
 import { loginValidator, signupValidator } from './validators'
+import { login, signup } from './auth.actions'
 
 class Login extends Component {
 	constructor(props) {
@@ -22,11 +23,7 @@ class Login extends Component {
 				email: '',
 				gender: '',
 				location: '',
-				birthday: {
-					month: 'January',
-					day: '1',
-					year: 1995
-				}
+				age: 18
 			},
 			errors: { hasErrors: false }
 		}
@@ -59,18 +56,37 @@ class Login extends Component {
 	}
 
 	handleLogin() {
+		const { login } = this.props
 		let errors = loginValidator(this.state.login)
 		if(errors.hasErrors) {
 			this.setState({ errors })
+		} else {
+			login(this.state.login)
+			.then(data => {
+				console.log('login data', data)
+			})
 		}
 		
-
 	}
 
 	handleSignUp() {
+		const { signup } = this.props
 		let errors = signupValidator(this.state.signup)
 		if(errors.hasErrors) {
 			this.setState({ errors })
+		} else {
+			signup(this.state.signup)
+			.then(data => {
+				const { auth } = this.props
+				console.log('auth', this.props.auth)
+				if(!auth.sucessfulLogin) {
+					let temp = {}
+					temp.errors = {}
+					temp.errors['hasErrors'] = true
+					temp.errors['Sign up failed: '] = [auth.error]
+					this.setState({ ...this.state, ...temp })
+				}
+			})
 		}
 		
 	}
@@ -96,18 +112,15 @@ class Login extends Component {
 	}
 
 	render() {
-
-		const { month, day, year } = this.state.signup.birthday
 		const { username, password } = this.state.login
-
+		const { age } = this.state.signup
 		//Checks if login inputs are valid
 		const isValidLogin = username.length && password.length
 		//Checks if signup inputs are valid
 		const isValidSignup = validateSignUp(this.state.signup)
-		//Call util func that returns the # of days depending on month
-		const numOfdays = getNumOfDays(monthsAndDays[month])
-		//Call util func that gives all possible birth years
-		const allBirthYears = birthYears()
+
+		//Get possible ages for signup input
+		const ages = possibleAges()
 
 		return (
 		<div>
@@ -152,22 +165,10 @@ class Login extends Component {
 	 							<input type="email" onChange={(e) => this.handleChange(e, 'signup', 'email')} className="form-control" placeholder="Email" />
 							</div>
 							<div className="input-group">
-	  							<span className="input-group-addon">Birthday </span>
-	  							<div className="col-xs-5">
-	  							<select className="form-control" name="month" value={month} onChange={(e) => this.handleDateChange(e, 'month')}>
-	  								{Object.keys(monthsAndDays).map(month => <option key={month} value={month}>{month}</option>)}
+	  							<span className="input-group-addon">Age</span>
+	  							<select className="form-control" name="age" value={age} onChange={(e) => this.handleChange(e, 'signup', 'age')}>
+	  								{ages.map(num => <option key={num} value={num}>{num}</option>)}
 								</select>
-								</div>
-								<div className="col-xs-3">
-								<select  className="form-control" name="day" value={day} onChange={(e) => this.handleDateChange(e, 'day')}>
-	  								{numOfdays.map(day => <option key={day} value={day}>{day}</option>)}
-								</select>
-								</div>
-								<div className="col-xs-4">
-								<select  className="form-control" name="year" value={year} onChange={(e) => this.handleDateChange(e, 'year')}>
-	  								{allBirthYears.map(year => <option key={year} value={year}>{year}</option>)}
-								</select>
-								</div>
 							</div>
 							<div className="input-group">
 								<span className="input-group-addon">Gender</span>
@@ -209,4 +210,4 @@ const mapStateToProps = ({ auth }) => {
 	return { auth }
 }
 
-export default connect(mapStateToProps)(Login)
+export default connect(mapStateToProps, { login, signup })(Login)

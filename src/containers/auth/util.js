@@ -17,25 +17,16 @@ export const monthsAndDays = {
 }
 
 //Function to change # of days depending on month
-export const getNumOfDays = (num) => {
+export const possibleAges = () => {
 	let result = []
-	for(let i = 1; i <= num; i++) {
+	for(let i = 18; i <= 90; i++) {
 		result.push(i)
 	}
 	return result
 }
 
-//Function to change # of days depending on month
-export const birthYears = () => {
-	let result = []
-	for(let i = 1925; i <= 2013; i++) {
-		result.push(i)
-	}
-	return result
-}
 
-export const validateSignUp = (state) => {
-	let values = [...Object.values(state)]
-	values.pop() //Deletes birthday Object so length can be validated
+export const validateSignUp = ({ username, password, confirmPassword, email, gender, location}) => {
+	let values = [username, password, confirmPassword, email, gender, location]
 	return _.every(values, item => item.length > 0)
 }
