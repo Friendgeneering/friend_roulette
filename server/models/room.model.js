@@ -9,10 +9,6 @@ const Room = sequelize.define('rooms', {
     allowNull: false,
     unique   : true,
   },
-  socketRoom: {
-    type  : Sequelize.STRING,
-    unique: true,
-  },
   location: {
     type: Sequelize.STRING,
   },
@@ -30,11 +26,15 @@ const Room = sequelize.define('rooms', {
     beforeValidate: async (room) => {
       try {
         room.name = (`${room.location}-${generateId()}`).replace(/\s/g, '');
-        console.log('room = ', room.toJSON());
         return sequelize.Promise.resolve(room);
       } catch (e) {
         return sequelize.Promise.reject(e);
       }
+    },
+  },
+  getterMethods: {
+    socketRoom: function() {
+      return `socket-${this.name}`;
     },
   },
 });
