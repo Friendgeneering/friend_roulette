@@ -1,5 +1,10 @@
 # Developer Documentation
 
+**Legend**
+
+* all parameters are **required** by unless indicated otherwise.
+* `?` denotes an optional parameter.
+
 ## REST API
 
 ### Authentication
@@ -18,7 +23,7 @@
 
   Response
     JSON
-      success: BOOL
+      success: BOOLEAN
       token ?: STRING
       err   ?: STRING
     Codes
@@ -40,13 +45,13 @@
     username: STRING
     password: STRING
     email   : STRING
-    age     : INT
+    age     : INTEGER
     location: STRING
     gender  : STRING
 
   Response
     JSON
-      success : BOOL
+      success : BOOLEAN
       token  ?: STRING
       message?: STRING
       err    ?: STRING
@@ -59,7 +64,7 @@
 
 ## Socket.IO API
 
-**Authentication**
+### Authentication
 
 Every socket connection requires authentication, since an attempted web socket connection implies the user intends to join a room.
 
@@ -80,3 +85,34 @@ io.connect('localhost:3001', {
 ```
 
 If unauthorized, the web socket connection will be rejected.
+
+### General Events
+
+These event(s) will be emitted from the server to the client at any given time, not specific to any part of the application:
+
+Server Emits: **`err`**
+
+```plaintext
+Data
+  err: STRING
+```
+
+### Connecting to a Room
+
+Once a successful connection is established, you may request to join a room by emitting a `connectTo` event from the client and can expect a `connectTo.response` 
+
+**`connectTo`** (client emission)
+
+```plaintext
+Data
+  roomId: INTEGER
+```
+
+**`connectTo.response`** (server emission)
+
+```plaintext
+Data
+  success: BOOLEAN
+  err   ?: STRING
+  users ?: ARRAY<OBJECT>
+```
