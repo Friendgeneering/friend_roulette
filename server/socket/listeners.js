@@ -14,7 +14,7 @@ import { connections } from './';
  *
  *  connectTo
  *
- *  @param {OBJECT} socket - socket.io client instance object
+ *  @param {OBJECT} socket - socket.io client instance
  *  @param {OBJECT} options
  *    - roomId: the room the user wants to join
  */
@@ -40,6 +40,12 @@ export const connectTo = async (socket, { roomId }) => {
   }
 };
 
+/**
+ *
+ *  leave
+ *
+ *  @param {OBJECT} socket - socket.io client instance
+ */
 export const leave = async (socket) => {
   try {
     const { user, room } = connections.get(socket);
