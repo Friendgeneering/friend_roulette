@@ -1,10 +1,13 @@
 import React, { Component } from 'react'
 import Geosuggest from 'react-geosuggest'
+import { connect } from 'react-redux'
 
 import { base } from '../../components/base'
-import { monthsAndDays, getNumOfDays, birthYears, validateSignUp } from './util'
+import { possibleAges, validateSignUp } from './util'
+import { loginValidator, signupValidator } from './validators'
+import { login, signup } from './auth.actions'
 
-export default class Login extends Component {
+class Login extends Component {
 	constructor(props) {
 		super(props)
 
@@ -20,14 +23,13 @@ export default class Login extends Component {
 				email: '',
 				gender: '',
 				location: '',
-				birthday: {
-					month: 'January',
-					day: '1',
-					year: 0
-				}
-			}
+				age: 18
+			},
+			errors: { hasErrors: false },
+			activeTab: 'login'
 		}
 
+		this.renderMessages = this.renderMessages.bind(this)
 		this.handleLogin = this.handleLogin.bind(this)
 		this.handleSignUp = this.handleSignUp.bind(this)
 		this.handleChange = this.handleChange.bind(this)
@@ -55,41 +57,114 @@ export default class Login extends Component {
 	}
 
 	handleLogin() {
-		
-
+		const { login } = this.props
+		let errors = loginValidator(this.state.login)
+		if(errors.hasErrors) {
+			this.setState({ errors })
+		} else {
+			login(this.state.login)
+			.then(data => {
+				const { auth } = this.props
+				if(!auth.sucessfulLogin) {
+					let temp = this.state
+					temp.errors['hasErrors'] = true
+					temp.errors['Login failed: '] = [auth.error]
+					this.setState({ ...this.state, ...temp })
+				}
+			})
+		}		
 	}
 
 	handleSignUp() {
+		const { signup } = this.props
+		let errors = signupValidator(this.state.signup)
+		if(errors.hasErrors) {
+			this.setState({ errors })
+		} else {
+			signup(this.state.signup)
+			.then(data => {
+				const { auth } = this.props
+				if(!auth.sucessfulLogin) {
+					let temp = this.state
+					temp.errors['hasErrors'] = true
+					temp.errors['Sign up failed: '] = [auth.error]
+					this.setState({ ...this.state, ...temp })
+				}
+			})
+		}	
+	}
+
+	renderMessages() {
+		const { activeTab } = this.state
+		//Render Error Messages
+		const { errors } = this.state
+		if(errors.hasErrors) {
+			return Object.keys(errors).map(error => {
+				if(errors[error].length) {
+					return (
+						<div key={error}>
+						<h4>{error}</h4>
+						<ul>{errors[error].map(e => {
+							return <li key={e}>{e}</li>
+						})}</ul>
+						</div>
+					)
+				}
+			})
+		} 
+		if(activeTab === 'login') {
+			return (
+				<div>
+				<h4>Welcome to Friend Roulette!</h4>
+				<p>Enter your username and password to login!</p>
+				</div>
+			)	
+		}
+		if(activeTab === 'signup') {
+			return (
+				<div>
+				<h4>Thanks for joining Friend Roulette!</h4>
+				<p>Your username should: </p>
+				<ul>
+					<li>Be more than 3 letters</li> 
+				</ul>
+				<p>Your password should: </p>
+				<ul>
+					<li>Be 8 or more characters</li>
+					<li>Contain 1 uppercase letter</li>
+					<li>Contain 1 number</li> 
+					<li>Only consist of letters and numbers</li>
+				</ul>
+				</div>
+			)	
+		}
 
 	}
 
 	render() {
-
-		const { month, day, year } = this.state.signup.birthday
 		const { username, password } = this.state.login
-
+		const { age } = this.state.signup
 		//Checks if login inputs are valid
 		const isValidLogin = username.length && password.length
 		//Checks if signup inputs are valid
 		const isValidSignup = validateSignUp(this.state.signup)
-		//Call util func that returns the # of days depending on month
-		const numOfdays = getNumOfDays(monthsAndDays[month])
-		//Call util func that gives all possible birth years
-		const allBirthYears = birthYears()
+
+		//Get possible ages for signup input
+		const ages = possibleAges()
 
 		return (
 		<div>
 			<base.navbar />
-			<div className="col-xs-6">
+			<div className="col-xs-6" id="boo" ref="top">
 				<div className="auth-container">	
 					<ul className="nav nav-tabs" role="tablist">
-					    <li role="presentation" className="active"><a href="#login" aria-controls="login" role="tab" data-toggle="tab">Login</a></li>
-					    <li role="presentation"><a href="#signup" aria-controls="signup" role="tab" data-toggle="tab">Sign Up</a></li>
+					    <li role="presentation" onClick={() => this.setState({ activeTab: 'login'})} className="active"><a href="#login" aria-controls="login" role="tab" data-toggle="tab">Login</a></li>
+					    <li role="presentation" onClick={() => this.setState({ activeTab: 'signup'})}><a href="#signup" aria-controls="signup" role="tab" data-toggle="tab">Sign Up</a></li>
 		  			</ul>
 
 					<div className="tab-content">
 						{/*Login Panel*/}
-					    <div role="tabpanel" className="tab-pane active" id="login">
+						<div role="tabpanel" className="tab-pane active" id="login" ref="login">
 					    	<div className="input-group">
 	  							<span className="input-group-addon"><span className="glyphicon glyphicon-user"></span></span>
 	 							<input type="text" onChange={(e) => this.handleChange(e, 'login' ,'username')} className="form-control" placeholder="Username" />
@@ -98,11 +173,11 @@ export default class Login extends Component {
 	  							<span className="input-group-addon"><span className="glyphicon glyphicon-lock"></span></span>
 	 							<input type="password" onChange={(e) => this.handleChange(e, 'login', 'password')} className="form-control" placeholder="Password" />
 							</div>
-							<button type="button" className="btn btn-primary" disabled={!isValidLogin} onSubmit={this.handleLogin}>Submit</button>
-					    </div>
-
+							<button type="submit" className="btn btn-primary" onClick={this.handleLogin} disabled={!isValidLogin}>Submit</button>
+						</div>
+		
 						{/*Signup Panel*/}
-					    <div role="tabpanel" className="tab-pane" id="signup">
+					    <div role="tabpanel" className="tab-pane" id="signup" ref="signup">
 					    	<div className="input-group">
 	  							<span className="input-group-addon"><span className="glyphicon glyphicon-user"></span></span>
 	 							<input type="text" onChange={(e) => this.handleChange(e, 'signup', 'username')} className="form-control" placeholder="Username" />
@@ -120,22 +195,10 @@ export default class Login extends Component {
 	 							<input type="email" onChange={(e) => this.handleChange(e, 'signup', 'email')} className="form-control" placeholder="Email" />
 							</div>
 							<div className="input-group">
-	  							<span className="input-group-addon">Birthday </span>
-	  							<div className="col-xs-5">
-	  							<select className="form-control" name="month" value={month} onChange={(e) => this.handleDateChange(e, 'month')}>
-	  								{Object.keys(monthsAndDays).map(month => <option key={month} value={month}>{month}</option>)}
+	  							<span className="input-group-addon">Age</span>
+	  							<select className="form-control" name="age" value={age} onChange={(e) => this.handleChange(e, 'signup', 'age')}>
+	  								{ages.map(num => <option key={num} value={num}>{num}</option>)}
 								</select>
-								</div>
-								<div className="col-xs-3">
-								<select  className="form-control" name="day" value={day} onChange={(e) => this.handleDateChange(e, 'day')}>
-	  								{numOfdays.map(day => <option key={day} value={day}>{day}</option>)}
-								</select>
-								</div>
-								<div className="col-xs-4">
-								<select  className="form-control" name="year" value={year} onChange={(e) => this.handleDateChange(e, 'year')}>
-	  								{allBirthYears.map(year => <option key={year} value={year}>{year}</option>)}
-								</select>
-								</div>
 							</div>
 							<div className="input-group">
 								<span className="input-group-addon">Gender</span>
@@ -160,14 +223,21 @@ export default class Login extends Component {
 						          onSuggestNoResults={this.onSuggestNoResults}
 						      	 />
 							</div>
-							<button type="submit" onSubmit={this.handleSignUp} disabled={!isValidSignup} className="btn btn-primary">Submit</button>
+							<button type="submit" onClick={this.handleSignUp} disabled={!isValidSignup} className="btn btn-primary">Submit</button>
 					    </div>
 					</div>
 				</div>
 			</div>
 			<div className="col-xs-6 error-container">
+				{this.renderMessages()}
 			</div>
 		</div>
 		)
 	}
 }
+
+const mapStateToProps = ({ auth }) => {
+	return { auth }
+}
+
+export default connect(mapStateToProps, { login, signup })(Login)
