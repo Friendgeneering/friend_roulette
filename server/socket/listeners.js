@@ -43,8 +43,19 @@ export const connectTo = async (socket, { roomId }) => {
 export const leave = async (socket) => {
   try {
     const { user, room } = connections.get(socket);
+
+    if (!room) {
+      return socket.emit('leave.response', {
+        success: false,
+        message: 'this client is currently not in a room',
+      });
+    }
+
     // disconnect from socket room
     socket.leave(room.socketRoom);
+
+    // update connections map
+    delete connections.get(socket).room;
 
     // remove db associations asynchronously
     user.removeRoom(room);
