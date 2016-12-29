@@ -5,9 +5,8 @@ const INITIAL_STATE = { user: {}, sucessfulLogin: false, error: '' }
 export default function(state = INITIAL_STATE, action) {
 	switch(action.type) {
 		case USER_LOGIN: {
-			console.log('action.payload')
 			const { data, response} = action.payload
-			let temp = {}
+			let temp = state
 			if(response) {
 				temp.error = response.data.err
 				return {...state, ...temp}
@@ -19,7 +18,7 @@ export default function(state = INITIAL_STATE, action) {
 
 		case USER_SIGNUP: {
 			const { data, response} = action.payload
-			let temp = {}
+			let temp = state
 			if(response) {
 				temp.error = response.data.err
 				return {...state, ...temp}

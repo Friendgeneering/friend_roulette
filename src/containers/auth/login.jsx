@@ -25,10 +25,11 @@ class Login extends Component {
 				location: '',
 				age: 18
 			},
-			errors: { hasErrors: false }
+			errors: { hasErrors: false },
+			activeTab: 'login'
 		}
 
-		this.renderErrors = this.renderErrors.bind(this)
+		this.renderMessages = this.renderMessages.bind(this)
 		this.handleLogin = this.handleLogin.bind(this)
 		this.handleSignUp = this.handleSignUp.bind(this)
 		this.handleChange = this.handleChange.bind(this)
@@ -63,10 +64,15 @@ class Login extends Component {
 		} else {
 			login(this.state.login)
 			.then(data => {
-				console.log('login data', data)
+				const { auth } = this.props
+				if(!auth.sucessfulLogin) {
+					let temp = this.state
+					temp.errors['hasErrors'] = true
+					temp.errors['Login failed: '] = [auth.error]
+					this.setState({ ...this.state, ...temp })
+				}
 			})
-		}
-		
+		}		
 	}
 
 	handleSignUp() {
@@ -78,20 +84,19 @@ class Login extends Component {
 			signup(this.state.signup)
 			.then(data => {
 				const { auth } = this.props
-				console.log('auth', this.props.auth)
 				if(!auth.sucessfulLogin) {
-					let temp = {}
-					temp.errors = {}
+					let temp = this.state
 					temp.errors['hasErrors'] = true
 					temp.errors['Sign up failed: '] = [auth.error]
 					this.setState({ ...this.state, ...temp })
 				}
 			})
-		}
-		
+		}	
 	}
 
-	renderErrors() {
+	renderMessages() {
+		const { activeTab } = this.state
+		//Render Error Messages
 		const { errors } = this.state
 		if(errors.hasErrors) {
 			return Object.keys(errors).map(error => {
@@ -106,9 +111,34 @@ class Login extends Component {
 					)
 				}
 			})
-		} else {
-			return <noscript />
+		} 
+		if(activeTab === 'login') {
+			return (
+				<div>
+				<h4>Welcome to Friend Roulette!</h4>
+				<p>Enter your username and password to login!</p>
+				</div>
+			)	
 		}
+		if(activeTab === 'signup') {
+			return (
+				<div>
+				<h4>Thanks for joining Friend Roulette!</h4>
+				<p>Your username should: </p>
+				<ul>
+					<li>Be more than 3 letters</li> 
+				</ul>
+				<p>Your password should: </p>
+				<ul>
+					<li>Be 8 or more characters</li>
+					<li>Contain 1 uppercase letter</li>
+					<li>Contain 1 number</li> 
+					<li>Only consist of letters and numbers</li>
+				</ul>
+				</div>
+			)	
+		}
+
 	}
 
 	render() {
@@ -125,16 +155,16 @@ class Login extends Component {
 		return (
 		<div>
 			<base.navbar />
-			<div className="col-xs-6">
+			<div className="col-xs-6" id="boo" ref="top">
 				<div className="auth-container">	
 					<ul className="nav nav-tabs" role="tablist">
-					    <li role="presentation" className="active"><a href="#login" aria-controls="login" role="tab" data-toggle="tab">Login</a></li>
-					    <li role="presentation"><a href="#signup" aria-controls="signup" role="tab" data-toggle="tab">Sign Up</a></li>
+					    <li role="presentation" onClick={() => this.setState({ activeTab: 'login'})} className="active"><a href="#login" aria-controls="login" role="tab" data-toggle="tab">Login</a></li>
+					    <li role="presentation" onClick={() => this.setState({ activeTab: 'signup'})}><a href="#signup" aria-controls="signup" role="tab" data-toggle="tab">Sign Up</a></li>
 		  			</ul>
 
 					<div className="tab-content">
 						{/*Login Panel*/}
-						<div role="tabpanel" className="tab-pane active" id="login">
+						<div role="tabpanel" className="tab-pane active" id="login" ref="login">
 					    	<div className="input-group">
 	  							<span className="input-group-addon"><span className="glyphicon glyphicon-user"></span></span>
 	 							<input type="text" onChange={(e) => this.handleChange(e, 'login' ,'username')} className="form-control" placeholder="Username" />
@@ -147,7 +177,7 @@ class Login extends Component {
 						</div>
 		
 						{/*Signup Panel*/}
-					    <div role="tabpanel" className="tab-pane" id="signup">
+					    <div role="tabpanel" className="tab-pane" id="signup" ref="signup">
 					    	<div className="input-group">
 	  							<span className="input-group-addon"><span className="glyphicon glyphicon-user"></span></span>
 	 							<input type="text" onChange={(e) => this.handleChange(e, 'signup', 'username')} className="form-control" placeholder="Username" />
@@ -199,7 +229,7 @@ class Login extends Component {
 				</div>
 			</div>
 			<div className="col-xs-6 error-container">
-				{this.renderErrors()}
+				{this.renderMessages()}
 			</div>
 		</div>
 		)
