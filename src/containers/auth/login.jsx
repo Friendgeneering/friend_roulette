@@ -37,6 +37,16 @@ class Login extends Component {
 		this.handleDateChange = this.handleDateChange.bind(this)
 	}
 
+	componentWillMount() {
+		//Check if user has token (ie. logged in). 
+		//If so, redirect to dashboard
+		let token = localStorage.getItem('user_token') || null
+		if(token !== null) {
+			this.props.router.push('dashboard')
+		}
+		
+	}
+
 	handleChange(e, type, fieldType) {
 		let newState = this.state
 		newState[type][fieldType] = e.target.value

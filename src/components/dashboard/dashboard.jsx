@@ -1,5 +1,7 @@
 import React, { Component } from 'react'
 
+import Navbar from '../base/navbar'
+
 export default class Dashboard extends Component {
 	constructor(props) {
 		super(props)
@@ -7,7 +9,10 @@ export default class Dashboard extends Component {
 
 	render() {
 		return (
-			<div>Dashboard</div>
+			<div>
+			<Navbar />
+			Dashboard
+			</div>
 		)
 	}
 }

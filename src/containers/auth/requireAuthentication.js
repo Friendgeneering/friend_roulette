@@ -3,9 +3,15 @@ import { connect } from 'react-redux';
 
 export function requireAuthentication(Component) {
 
-    let token = localStorage.getItem('user_token') || null
 
     class AuthenticatedComponent extends React.Component {
+
+        constructor(props) {
+            super(props)
+
+            this.state = { token: localStorage.getItem('user_token') || null }
+        }
+
 
         componentWillMount() {
             this.checkAuth();
@@ -16,12 +22,14 @@ export function requireAuthentication(Component) {
         }
 
         checkAuth() {
+            const { token } = this.state
             if (token === null) {
                 this.props.router.push('/');
             }
         }
 
         render() {
+            const { token } = this.state
             return (
                 <div>
                     {token !== null ? <Component {...this.props}/>
