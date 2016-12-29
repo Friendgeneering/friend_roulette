@@ -2,6 +2,7 @@ import Sequelize from 'sequelize';
 import { promisify } from 'bluebird';
 import { hash, compare } from 'bcrypt';
 import { sign } from 'jsonwebtoken';
+import { pick } from 'lodash';
 
 import sequelize from '../db';
 import { jwtSecret } from '../config';
@@ -43,6 +44,18 @@ const User = sequelize.define('users', {
     allowNull: false,
   },
 }, {
+  getterMethods: {
+    getData: function() {
+      return pick(this.dataValues, [
+        'username',
+        'email',
+        'age',
+        'photoUrl',
+        'location',
+        'gender',
+      ]);
+    },
+  },
   /**
    *
    *  We use hooks for injecting required tasks to model events to conceal necessary

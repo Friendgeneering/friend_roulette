@@ -1,6 +1,7 @@
 import { verify } from 'jsonwebtoken';
 import { each } from 'lodash';
 
+import { User } from '../models';
 import { jwtSecret } from '../config';
 import * as listeners from './listeners';
 
@@ -26,18 +27,26 @@ export const initSockets = (io) => {
    *  Authentication middleware
    *
    *  client-side setup:
-   *  @url https://goo.gl/7jMef1
+   *  @url {https://goo.gl/7jMef1}
    */
   io.use(async (socket, next) => {
     try {
       const { token } = socket.handshake.query;
       const decoded = await verify(token, jwtSecret);
       if (decoded) {
-        // if authorized, store the socket instance & user data in map:
-        connections.set(socket, decoded);
-        return next();
+        // store the socket instance & user instance in the connections map
+        const user = await User.findById(decoded.id);
+        if (user) {
+          connections.set(socket, {
+            user,
+          });
+          console.log('socket connected');
+          return next();
+        }
+        throw new Error('user not found');
       }
     } catch (e) {
+      console.log('e = ', e.toString());
       return next(new Error(`Invalid token. Err = ${e.toString()}`));
     }
   });
@@ -48,7 +57,7 @@ export const initSockets = (io) => {
      *  Event listeners
      */
     each(listeners, (listener, listenerName) => {
-      socket.on(listenerName, listener.bind(null, socket));
+      socket.on(listenerName, listener.bind(null, { io, socket }));
     });
   });
 };
