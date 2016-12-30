@@ -2,8 +2,9 @@
 
 **Legend**
 
-* all parameters are **required** by unless indicated otherwise.
+* all parameters are **required** unless indicated otherwise.
 * `?` denotes an optional parameter.
+* '*TOKEN required*' denotes that 
 
 ## REST API
 
@@ -60,6 +61,72 @@
       400: validation errors
       409: username already exists
       500: server error
+```
+
+### Rooms
+
+Fetching a list of all users (online & offline) associated with a specific room
+
+**`/api/rooms/:roomId/users`** - *TOKEN required*
+
+```plaintext
+{GET}
+  Query
+    token: STRING
+
+  Params
+    /api/rooms/:roomId/users
+      e.g. fetch('/api/rooms/3/users') - looks for all users associated with a room of id 3
+
+  Response
+    JSON
+      success: BOOLEAN
+      users  : ARRAY<OBJECT>
+      err   ?: STRING
+    Codes
+      200: success
+      400: validation errors
+      500: server error
+```
+
+**`/api/rooms/user`** - *TOKEN required*
+
+```
+{GET}
+  Query
+    token: STRING
+
+  Params
+
+  Response
+
+      
+```
+
+**`/api/rooms/all`** - *TOKEN required*
+
+```
+{GET}
+  Query
+    token: STRING
+
+  Params
+
+  Response
+```
+
+**`/api/rooms/find`** - *TOKEN required*
+
+```
+{POST}
+  Query
+    token: STRING
+
+  Params
+
+  Body
+
+  Response
 ```
 
 ## Socket.IO API
