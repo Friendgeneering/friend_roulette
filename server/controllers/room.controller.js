@@ -50,11 +50,12 @@ export const fetchOrCreateRoom = async (req, res) => {
 
   try {
     const { location, gender, minAge, maxAge } = req.body;
-    const rooms = await Room.find({
+    const rooms = await Room.findAll({
       where: { location, gender, minAge, maxAge },
     });
     if (rooms && rooms.length) {
       res.json({
+        newRoom: false,
         success: true,
         rooms  : rooms.map(room => room.toJSON()),
       });
@@ -63,6 +64,7 @@ export const fetchOrCreateRoom = async (req, res) => {
     console.log('creating room');
     const room = await Room.create({ location, gender, minAge, maxAge });
     res.json({
+      newRoom: true,
       success: true,
       room   : room.toJSON(),
     });

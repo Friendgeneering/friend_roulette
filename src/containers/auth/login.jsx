@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import Geosuggest from 'react-geosuggest'
 import { connect } from 'react-redux'
 
-import { base } from '../../components/base'
+import Navbar from '../../components/base/navbar'
 import { possibleAges, validateSignUp } from './util'
 import { loginValidator, signupValidator } from './validators'
 import { login, signup } from './auth.actions'
@@ -35,6 +35,16 @@ class Login extends Component {
 		this.handleChange = this.handleChange.bind(this)
 		this.onSuggestSelect = this.onSuggestSelect.bind(this)
 		this.handleDateChange = this.handleDateChange.bind(this)
+	}
+
+	componentWillMount() {
+		//Check if user has token (ie. logged in). 
+		//If so, redirect to dashboard
+		let token = localStorage.getItem('user_token') || null
+		if(token !== null) {
+			this.props.router.push('dashboard')
+		}
+		
 	}
 
 	handleChange(e, type, fieldType) {
@@ -70,7 +80,11 @@ class Login extends Component {
 					temp.errors['hasErrors'] = true
 					temp.errors['Login failed: '] = [auth.error]
 					this.setState({ ...this.state, ...temp })
+				} else {
+					localStorage.setItem('user_token', auth.user.token)
+					this.props.router.push('dashboard')
 				}
+				
 			})
 		}		
 	}
@@ -89,6 +103,9 @@ class Login extends Component {
 					temp.errors['hasErrors'] = true
 					temp.errors['Sign up failed: '] = [auth.error]
 					this.setState({ ...this.state, ...temp })
+				} else {
+					localStorage.setItem('user_token', auth.user.token)
+					this.props.router.push('dashboard')
 				}
 			})
 		}	
@@ -154,7 +171,7 @@ class Login extends Component {
 
 		return (
 		<div>
-			<base.navbar />
+			<Navbar />
 			<div className="col-xs-6" id="boo" ref="top">
 				<div className="auth-container">	
 					<ul className="nav nav-tabs" role="tablist">
