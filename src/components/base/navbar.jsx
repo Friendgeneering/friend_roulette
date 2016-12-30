@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { Link } from 'react-router'
 
 
 export default class Navbar extends Component {
@@ -9,6 +10,9 @@ export default class Navbar extends Component {
 	}
 
 	render() {
+
+		let token = localStorage.getItem('user_token') || null
+
 		return (
 			<div>
 			<nav className="navbar navbar-default">
@@ -21,7 +25,7 @@ export default class Navbar extends Component {
 					    <span className="caret"></span>
 					    </button>
 					    <ul className="dropdown-menu" role="menu" aria-labelledby="menu1">
-					      <li role="presentation"><a role="menuitem" tabIndex="-1" href="#">Profile</a></li>
+					      <li role="presentation"><Link to={'/profile/' + token + ''} role="menuitem" tabIndex="-1" href="#">Profile</Link></li>
 					      <li role="presentation"><a role="menuitem" tabIndex="-1" href="#">Logout</a></li>
 					    </ul>
   					</div>
