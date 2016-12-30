@@ -91,6 +91,8 @@ Fetching a list of all users (online & offline) associated with a specific room
 
 **`/api/rooms/user`** - *TOKEN required*
 
+returns all rooms that a client is associated with
+
 ```
 {GET}
   Query
@@ -99,12 +101,19 @@ Fetching a list of all users (online & offline) associated with a specific room
   Params
 
   Response
-
-      
+    JSON
+      success: BOOLEAN
+      rooms ?: ARRAY<OBJECT>
+      err   ?: STRING
+    Codes
+      200: success
+      500: server error
 ```
 
 **`/api/rooms/all`** - *TOKEN required*
 
+returns a list of all rooms
+
 ```
 {GET}
   Query
@@ -113,6 +122,13 @@ Fetching a list of all users (online & offline) associated with a specific room
   Params
 
   Response
+    JSON
+      success: STRING
+      rooms ?: ARRAY<OBJECT>
+      err   ?: STRING
+    Codes
+      200: success
+      500: server error
 ```
 
 **`/api/rooms/find`** - *TOKEN required*
@@ -125,8 +141,20 @@ Fetching a list of all users (online & offline) associated with a specific room
   Params
 
   Body
+    location: STRING
+    gender  : STRING ("male", "female", or "any")
+    minAge  : INTEGER
+    maxAge  : INTEGER
 
   Response
+    JSON
+      success : BOOLEAN
+      newRoom?: BOOLEAN
+      room   ?: OBJECT
+      err    ?: STRING
+    Codes
+      200 success
+      500 server error
 ```
 
 ## Socket.IO API
