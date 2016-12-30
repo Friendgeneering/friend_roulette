@@ -3,20 +3,79 @@ import { Room } from '../models';
 
 /**
  *
- *  @route /api/rooms
+ *  @route /api/rooms/:roomId:/users
  *
  *  @method {GET}
  *
- *  @query {
- *
+ *  @params {
+ *    roomId : STRING representing `id` primary key in room row
  *  }
  */
-export const fetchRooms = async (req, res) => {
+export const fetchUsersForRoom = async (req, res) => {
+  const { roomId } = req.params;
+  if (!roomId) {
+    return res.status(400).json({
+      success: false,
+      err    : 'please provide a roomId in the URL: /api/rooms/:roomId/users',
+    });
+  }
   try {
-    const rooms = await Room.findAll();
-    console.log('rooms = ', rooms);
+    const room = await Room.findById(roomId);
+    const users = await room.getUsers();
+    if (!room) {
+      return res.status(400).json({
+        success: false,
+        err    : 'room does not exist',
+      });
+    }
+    return res.json({
+      success: true,
+      users  : users.map(user => user.getData),
+    });
+  } catch (e) {
+    res.status(500).json({
+      success: false,
+      err    : e.toString(),
+    });
+  }
+};
+
+/**
+ *
+ *  @route /api/rooms/user
+ *  TOKEN required
+ *
+ *  @method {GET}
+ */
+export const fetchRoomsForUser = async (req, res) => {
+  try {
+    const { user } = req;
+    const rooms = await user.getRooms();
     res.json({
       success: true,
+      rooms  : rooms.map(room => room.toJSON()),
+    });
+  } catch (e) {
+    res.status(500).json({
+      success: false,
+      err    : e.toString(),
+    });
+  }
+};
+
+/**
+ *
+ *  @route /api/rooms/all
+ *  TOKEN required
+ *
+ *  @method {GET}
+ */
+export const fetchAllRooms = async (req, res) => {
+  try {
+    const rooms = await Room.findAll();
+    res.json({
+      success: true,
+      rooms  : rooms.map(room => room.toJSON()),
     });
   } catch (e) {
     res.status(500).json({
@@ -29,6 +88,7 @@ export const fetchRooms = async (req, res) => {
 /**
  *
  *  @route /api/rooms/find
+ *  TOKEN required
  *
  *  @method {POST}
  *
@@ -49,21 +109,26 @@ export const fetchOrCreateRoom = async (req, res) => {
   }
 
   try {
+    const { user } = req;
     const { location, gender, minAge, maxAge } = req.body;
     const rooms = await Room.findAll({
       where: { location, gender, minAge, maxAge },
     });
     if (rooms && rooms.length) {
-      res.json({
+      // pick a random room
+      const room = rooms[Math.floor(Math.random * rooms.length)];
+      // create association
+      await room.addUser(user);
+      return res.json({
         newRoom: false,
         success: true,
-        rooms  : rooms.map(room => room.toJSON()),
+        room   : room.toJSON(),
       });
-      return;
     }
-    console.log('creating room');
     const room = await Room.create({ location, gender, minAge, maxAge });
-    res.json({
+    // create association
+    await room.addUser(user);
+    return res.json({
       newRoom: true,
       success: true,
       room   : room.toJSON(),

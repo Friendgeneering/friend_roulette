@@ -2,8 +2,9 @@
 
 **Legend**
 
-* all parameters are **required** by unless indicated otherwise.
+* all parameters are **required** unless indicated otherwise.
 * `?` denotes an optional parameter.
+* '*TOKEN required*' denotes that 
 
 ## REST API
 
@@ -62,6 +63,100 @@
       500: server error
 ```
 
+### Rooms
+
+Fetching a list of all users (online & offline) associated with a specific room
+
+**`/api/rooms/:roomId/users`** - *TOKEN required*
+
+```plaintext
+{GET}
+  Query
+    token: STRING
+
+  Params
+    /api/rooms/:roomId/users
+      e.g. fetch('/api/rooms/3/users') - looks for all users associated with a room of id 3
+
+  Response
+    JSON
+      success: BOOLEAN
+      users  : ARRAY<OBJECT>
+      err   ?: STRING
+    Codes
+      200: success
+      400: validation errors
+      500: server error
+```
+
+**`/api/rooms/user`** - *TOKEN required*
+
+returns all rooms that a client is associated with
+
+```
+{GET}
+  Query
+    token: STRING
+
+  Params
+
+  Response
+    JSON
+      success: BOOLEAN
+      rooms ?: ARRAY<OBJECT>
+      err   ?: STRING
+    Codes
+      200: success
+      500: server error
+```
+
+**`/api/rooms/all`** - *TOKEN required*
+
+returns a list of all rooms
+
+```
+{GET}
+  Query
+    token: STRING
+
+  Params
+
+  Response
+    JSON
+      success: STRING
+      rooms ?: ARRAY<OBJECT>
+      err   ?: STRING
+    Codes
+      200: success
+      500: server error
+```
+
+**`/api/rooms/find`** - *TOKEN required*
+
+```
+{POST}
+  Query
+    token: STRING
+
+  Params
+
+  Body
+    location: STRING
+    gender  : STRING ("male", "female", or "any")
+    minAge  : INTEGER
+    maxAge  : INTEGER
+
+  Response
+    JSON
+      success : BOOLEAN
+      newRoom?: BOOLEAN
+      room   ?: OBJECT
+      err    ?: STRING
+    Codes
+      200 success
+      500 server error
+```
+
 ## Socket.IO API
 
 ### Authentication
@@ -116,3 +211,6 @@ Data
   err   ?: STRING
   users ?: ARRAY<OBJECT>
 ```
+
+### Leaving a room
+

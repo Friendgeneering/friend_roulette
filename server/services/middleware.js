@@ -27,7 +27,6 @@ export const isAuthed = async (req, res, next) => {
     const { id } = await verifyToken(token, jwtSecret);
     // attaches the sequelize user instance to the request object for convenience
     req.user = await User.findById(id);
-    console.log('req.user = ', req.user.dataValues);
     next();
   } catch (e) {
     if (e.name === 'TokenExpiredError') {
