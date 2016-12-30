@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import Geosuggest from 'react-geosuggest'
 import { connect } from 'react-redux'
 
-import { ageInIncrementsOf5 } from './util'
+import { ageInIncrementsOf5, validateChatQuery } from './util'
 import { findChatRoom } from './chat.actions'
 
 class Modal extends Component {
@@ -13,7 +13,8 @@ class Modal extends Component {
 			gender: 'Men',
 			location: '',
 			minAge: 18,
-			maxAge: 90
+			maxAge: 30,
+			errors: []
 		}
 		this.fetchRooms = this.fetchRooms.bind(this)
 		this.handleChange = this.handleChange.bind(this)
@@ -40,16 +41,27 @@ class Modal extends Component {
 
 	fetchRooms() {
 		const { findChatRoom } = this.props
-		findChatRoom(this.state)
-		.then(data => {
-			console.log('chat room data', data)
-		})
+		const { minAge, maxAge } = this.state
+		let queryErrors = validateChatQuery(minAge, maxAge)
+
+		if(queryErrors.length > 0) {
+			this.setState({ errors: queryErrors })
+		} else {	
+			findChatRoom(this.state)
+			.then(data => {
+				console.log('chat room data', data)
+			})
+		}
+
+
 
 	}
 
 	render() {
 		//Array of ages for min & max age inputs
 		let ages = ageInIncrementsOf5()
+
+		const { errors } = this.state
 
 		return (
 		<div className="modal-dialog">
@@ -96,6 +108,9 @@ class Modal extends Component {
 		      	</div>
 			  </div>
 		      <div className="modal-footer">
+	      		<ul className="queryErrors">
+	      		{errors.length > 0 ? errors.map(e => <li key={e}>{e}</li>) : null}
+	      		</ul>
 		      	<div className="btn-group">
 		        	<button type="button" className="btn btn-success" onClick={this.fetchRooms}>Find a Chat!</button>
 		        	<button type="button" className="btn btn-default" data-dismiss="modal">Close</button>
