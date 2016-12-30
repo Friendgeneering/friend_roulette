@@ -116,3 +116,6 @@ Data
   err   ?: STRING
   users ?: ARRAY<OBJECT>
 ```
+
+### Leaving a room
+

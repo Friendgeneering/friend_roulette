@@ -27,7 +27,7 @@ export const connectTo = async ({ io, socket }, { roomId }) => {
     });
   }
   try {
-    const user = connections.get(socket).user;
+    // const user = connections.get(socket).user;
     const room = await Room.findById(roomId);
     if (room) {
       // join socket to server room
@@ -48,8 +48,6 @@ export const connectTo = async ({ io, socket }, { roomId }) => {
         success: true,
         users  : users.map(userInstance => userInstance.getData),
       });
-      // create join table entry
-      return room.addUser(user);
     }
     socket.emit('connectTo.response', {
       err: `room with roomId ${roomId} not found`,
