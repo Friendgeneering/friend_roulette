@@ -133,6 +133,8 @@ returns a list of all rooms
 
 **`/api/rooms/find`** - *TOKEN required*
 
+This POST request also has the side effect of creating an association between the user who submitted the request and the room that was found or created. the `newRoom` BOOLEAN in the response indicates whethere this is a newly created room or not.
+
 ```
 {POST}
   Query
@@ -185,7 +187,7 @@ If unauthorized, the web socket connection will be rejected.
 
 These event(s) will be emitted from the server to the client at any given time, not specific to any part of the application:
 
-Server Emits: **`err`**
+**`err`** (server emission)
 
 ```plaintext
 Data
