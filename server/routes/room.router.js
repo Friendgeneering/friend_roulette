@@ -6,13 +6,17 @@ import {
   fetchRoomsForUser,
   fetchAllRooms,
   fetchOrCreateRoom,
+  removeRoom,
 } from '../controllers/room.controller';
 
 const roomRouter = Router();
 
-roomRouter.get('/:roomId/users', isAuthed, fetchUsersForRoom);
-roomRouter.get('/user', isAuthed, fetchRoomsForUser);
-roomRouter.get('/all', isAuthed, fetchAllRooms);
-roomRouter.post('/find', isAuthed, fetchOrCreateRoom);
+roomRouter.use(isAuthed);
+
+roomRouter.get('/:roomId/users', fetchUsersForRoom);
+roomRouter.get('/user', fetchRoomsForUser);
+roomRouter.get('/all', fetchAllRooms);
+roomRouter.post('/find', fetchOrCreateRoom);
+roomRouter.post('/remove/:roomId', removeRoom);
 
 export default roomRouter;
