@@ -120,8 +120,8 @@ export const fetchOrCreateRoom = async (req, res) => {
       // create association
       await room.addUser(user);
       return res.json({
-        newRoom: false,
         success: true,
+        newRoom: false,
         room   : room.toJSON(),
       });
     }
@@ -129,8 +129,8 @@ export const fetchOrCreateRoom = async (req, res) => {
     // create association
     await room.addUser(user);
     return res.json({
-      newRoom: true,
       success: true,
+      newRoom: true,
       room   : room.toJSON(),
     });
   } catch (e) {

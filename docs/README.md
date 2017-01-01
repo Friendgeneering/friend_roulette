@@ -2,9 +2,8 @@
 
 **Legend**
 
-* all parameters are **required** unless indicated otherwise.
-* `?` denotes an optional parameter.
-* '*TOKEN required*' denotes that 
+* all parameters are **required** unless indicated otherwise
+* `?` denotes an optional parameter
 
 ## REST API
 
@@ -133,6 +132,8 @@ returns a list of all rooms
 
 **`/api/rooms/find`** - *TOKEN required*
 
+This POST request also has the side effect of creating an association between the user who submitted the request and the room that was found or created. the `newRoom` BOOLEAN in the response indicates whethere this is a newly created room or not.
+
 ```
 {POST}
   Query
@@ -185,7 +186,7 @@ If unauthorized, the web socket connection will be rejected.
 
 These event(s) will be emitted from the server to the client at any given time, not specific to any part of the application:
 
-Server Emits: **`err`**
+**`err`** (server emission)
 
 ```plaintext
 Data
@@ -214,3 +215,58 @@ Data
 
 ### Leaving a room
 
+**`leave`** (client emission)
+
+```plainext
+Data
+  (none required)
+```
+
+**`leave.response`** (server emission)
+
+```plaintext
+Data
+  success: BOOLEAN
+  err   ?: STRING
+```
+
+### In-Room Events
+
+**`newMessage`** (client emission)
+
+```plaintext
+Data
+  message: STRING
+```
+
+**`newMessage.response`** (server emission)
+
+```plaintext
+Data
+  success: BOOLEAN
+  err   ?: STRING
+```
+
+When connected to a socket room, a client also needs to know when other clients connect, disconnect, and post a new message from the same room. These events will be useful for that:
+
+**`user message`** (server emission)
+
+```plaintext
+DATA
+  message?: STRING
+  user    : OBJECT
+```
+
+**`user connect`** (server emission)
+
+```plaintext
+DATA
+  user: OBJECT
+```
+
+**`user leave`** (server emission)
+
+```plaintext
+DATA
+  user: OBJECT
+```
