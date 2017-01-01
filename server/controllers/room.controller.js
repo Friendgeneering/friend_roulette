@@ -1,4 +1,4 @@
-import { isRequestInvalid } from '../services/validation';
+import { isRequestInvalid, roomExists } from '../services/validation';
 import { Room } from '../models';
 
 /**
@@ -22,18 +22,16 @@ export const fetchUsersForRoom = async (req, res) => {
   try {
     const room = await Room.findById(roomId);
     const users = await room.getUsers();
-    if (!room) {
-      return res.status(400).json({
-        success: false,
-        err    : 'room does not exist',
-      });
+    if (!(await roomExists(req, res, roomId))) {
+      return;
     }
     return res.json({
       success: true,
       users  : users.map(user => user.getData),
     });
   } catch (e) {
-    res.status(500).json({
+    console.log(e);
+    return res.status(500).json({
       success: false,
       err    : e.toString(),
     });
@@ -51,12 +49,13 @@ export const fetchRoomsForUser = async (req, res) => {
   try {
     const { user } = req;
     const rooms = await user.getRooms();
-    res.json({
+    return res.json({
       success: true,
       rooms  : rooms.map(room => room.toJSON()),
     });
   } catch (e) {
-    res.status(500).json({
+    console.log(e);
+    return res.status(500).json({
       success: false,
       err    : e.toString(),
     });
@@ -73,12 +72,13 @@ export const fetchRoomsForUser = async (req, res) => {
 export const fetchAllRooms = async (req, res) => {
   try {
     const rooms = await Room.findAll();
-    res.json({
+    return res.json({
       success: true,
       rooms  : rooms.map(room => room.toJSON()),
     });
   } catch (e) {
-    res.status(500).json({
+    console.log(e);
+    return res.status(500).json({
       success: false,
       err    : e.toString(),
     });
@@ -116,7 +116,8 @@ export const fetchOrCreateRoom = async (req, res) => {
     });
     if (rooms && rooms.length) {
       // pick a random room
-      const room = rooms[Math.floor(Math.random * rooms.length)];
+      const randomIdx = Math.floor(Math.random() * rooms.length);
+      const room = rooms[randomIdx];
       // create association
       await room.addUser(user);
       return res.json({
@@ -134,6 +135,46 @@ export const fetchOrCreateRoom = async (req, res) => {
       room   : room.toJSON(),
     });
   } catch (e) {
+    console.log(e);
+    return res.status(500).json({
+      success: false,
+      err    : e.toString(),
+    });
+  }
+};
+
+/**
+ *
+ *  @route /api/rooms/remove/:roomdId
+ *  TOKEN required
+ *
+ *  @method {POST}
+ *
+ *  @params {
+ *    roomId: roomId that the user intends to disassociate themselves with
+ *  }
+ */
+export const removeRoom = async (req, res) => {
+  const { roomId } = req.params;
+  if (!roomId) {
+    return res.status(400).json({
+      success: false,
+      err    : 'please provide a roomId in the URL: /api/rooms/remove/:roomId',
+    });
+  }
+  try {
+    const { user } = req;
+    const room = await Room.findById(roomId);
+    if (!(await roomExists(req, res, roomId))) {
+      return;
+    }
+    // remove association
+    await user.removeRoom(room);
+    return res.json({
+      success: true,
+    });
+  } catch (e) {
+    console.log(e);
     res.status(500).json({
       success: false,
       err    : e.toString(),
