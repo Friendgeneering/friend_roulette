@@ -27,6 +27,7 @@ export const connectTo = async ({ io, socket }, { roomId }) => {
     });
   }
   try {
+    const { user } = connections.get(socket);
     const room = await Room.findById(roomId);
     if (room) {
       // join socket to server room
@@ -42,11 +43,16 @@ export const connectTo = async ({ io, socket }, { roomId }) => {
       });
       const users = clients.map(socketInstance => connections.get(socketInstance).user);
 
-      // send client a success response with current list of users
+      // send client a success response with current list of online users
       socket.emit('connectTo.response', {
         success: true,
         users  : users.map(userInstance => userInstance.getData),
       });
+      socket.broadcast.to(room.socketRoom).emit('user connect', {
+        user: user.getData,
+      });
+
+      return;
     }
     socket.emit('connectTo.response', {
       err: `room with roomId ${roomId} not found`,
@@ -89,8 +95,9 @@ export const leave = async ({ socket }) => {
     // disconnect from socket room
     socket.leave(room.socketRoom);
   } catch (e) {
-    socket.emit('err.response', {
-      err: e.toString(),
+    socket.emit('leave.response', {
+      success: false,
+      err    : e.toString(),
     });
   }
 };
@@ -105,18 +112,23 @@ export const leave = async ({ socket }) => {
  *  all other clients in the room the socket belongs to
  */
 export const newMessage = async ({ socket }, { message }) => {
-  const { room, user } = connections.get(socket);
-  // send success response to sender
-  socket.emit('newMessage.response', {
-    success: true,
-    message,
-    user: user.getData,
-  });
-  // send message to all clients in room
-  socket.broadcast.to(room.socketRoom).emit('incomingMessage', {
-    message,
-    user: user.getData,
-  });
+  try {
+    const { room, user } = connections.get(socket);
+    // send success response to sender
+    socket.emit('newMessage.response', {
+      success: true,
+    });
+    // send message to all clients in room
+    socket.broadcast.to(room.socketRoom).emit('user message', {
+      message,
+      user: user.getData,
+    });
+  } catch (e) {
+    socket.emit('newMessage.response', {
+      success: false,
+      err    : e.toString(),
+    });
+  }
 };
 
 /**
@@ -124,6 +136,5 @@ export const newMessage = async ({ socket }, { message }) => {
  *  A disconnect handler
  */
 export const disconnect = async (socket) => {
-  const { user, room } = connections.get(socket);
   connections.delete(socket);
 };
