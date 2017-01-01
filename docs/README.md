@@ -253,8 +253,8 @@ When connected to a socket room, a client also needs to know when other clients 
 
 ```plaintext
 DATA
-  message?: STRING
-  user    : OBJECT
+  message: STRING
+  user   : OBJECT
 ```
 
 **`user connect`** (server emission)
