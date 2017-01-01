@@ -27,7 +27,6 @@ export const connectTo = async ({ io, socket }, { roomId }) => {
     });
   }
   try {
-    // const user = connections.get(socket).user;
     const room = await Room.findById(roomId);
     if (room) {
       // join socket to server room
@@ -87,10 +86,6 @@ export const leave = async ({ socket }) => {
     // update connections map
     delete connections.get(socket).room;
 
-    // remove db associations asynchronously
-    user.removeRoom(room);
-    room.removeUser(user);
-
     // disconnect from socket room
     socket.leave(room.socketRoom);
   } catch (e) {
@@ -111,7 +106,14 @@ export const leave = async ({ socket }) => {
  */
 export const newMessage = async ({ socket }, { message }) => {
   const { room, user } = connections.get(socket);
-  socket.broadcast.to(room.socketRoom).emit('newMessage.response', {
+  // send success response to sender
+  socket.emit('newMessage.response', {
+    success: true,
+    message,
+    user: user.getData,
+  });
+  // send message to all clients in room
+  socket.broadcast.to(room.socketRoom).emit('incomingMessage', {
     message,
     user: user.getData,
   });
@@ -123,10 +125,5 @@ export const newMessage = async ({ socket }, { message }) => {
  */
 export const disconnect = async (socket) => {
   const { user, room } = connections.get(socket);
-  // if the user is in a room, remove the association in DB
-  if (room) {
-    user.removeRoom(room);
-    room.removeUser(user);
-  }
   connections.delete(socket);
 };
