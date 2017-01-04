@@ -10,8 +10,12 @@ export const ageInIncrementsOf5 = () => {
 	return results
 }
 
-export const validateChatQuery = (minAge, maxAge) => {
+export const validateChatQuery = (minAge, maxAge, location) => {
 	let errors = []
+
+	if(location === '') {
+		errors.push('Please choose a location')
+	}
 
 	if(minAge === maxAge) {
 		errors.push('Please choose a range of ages')
