@@ -33,6 +33,7 @@ export const signIn = async (req, res) => {
       err    : 'invalid username or password',
     });
   } catch (e) {
+    console.log(e);
     res.status(500).json({
       success: false,
       err    : e.toString(),
@@ -89,6 +90,7 @@ export const signUp = async (req, res) => {
       token  : await user.getToken(),
     });
   } catch (e) {
+    console.log(e);
     res.status(500).json({
       success: false,
       err    : e.toString(),

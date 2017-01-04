@@ -2,8 +2,8 @@
 
 **Legend**
 
-* all parameters are **required** by unless indicated otherwise.
-* `?` denotes an optional parameter.
+* all parameters are **required** unless indicated otherwise
+* `?` denotes an optional parameter
 
 ## REST API
 
@@ -62,6 +62,102 @@
       500: server error
 ```
 
+### Rooms
+
+Fetching a list of all users (online & offline) associated with a specific room
+
+**`/api/rooms/:roomId/users`** - *TOKEN required*
+
+```plaintext
+{GET}
+  Query
+    token: STRING
+
+  Params
+    /api/rooms/:roomId/users
+      e.g. fetch('/api/rooms/3/users') - looks for all users associated with a room of id 3
+
+  Response
+    JSON
+      success: BOOLEAN
+      users  : ARRAY<OBJECT>
+      err   ?: STRING
+    Codes
+      200: success
+      400: validation errors
+      500: server error
+```
+
+**`/api/rooms/user`** - *TOKEN required*
+
+returns all rooms that a client is associated with
+
+```
+{GET}
+  Query
+    token: STRING
+
+  Params
+
+  Response
+    JSON
+      success: BOOLEAN
+      rooms ?: ARRAY<OBJECT>
+      err   ?: STRING
+    Codes
+      200: success
+      500: server error
+```
+
+**`/api/rooms/all`** - *TOKEN required*
+
+returns a list of all rooms
+
+```
+{GET}
+  Query
+    token: STRING
+
+  Params
+
+  Response
+    JSON
+      success: STRING
+      rooms ?: ARRAY<OBJECT>
+      err   ?: STRING
+    Codes
+      200: success
+      500: server error
+```
+
+**`/api/rooms/find`** - *TOKEN required*
+
+This POST request also has the side effect of creating an association between the user who submitted the request and the room that was found or created. the `newRoom` BOOLEAN in the response indicates whethere this is a newly created room or not.
+
+```
+{POST}
+  Query
+    token: STRING
+
+  Params
+
+  Body
+    location: STRING
+    gender  : STRING ("male", "female", or "any")
+    minAge  : INTEGER
+    maxAge  : INTEGER
+
+  Response
+    JSON
+      success : BOOLEAN
+      newRoom?: BOOLEAN
+      room   ?: OBJECT
+      err    ?: STRING
+    Codes
+      200 success
+      500 server error
+```
+
 ## Socket.IO API
 
 ### Authentication
@@ -90,7 +186,7 @@ If unauthorized, the web socket connection will be rejected.
 
 These event(s) will be emitted from the server to the client at any given time, not specific to any part of the application:
 
-Server Emits: **`err`**
+**`err`** (server emission)
 
 ```plaintext
 Data
@@ -115,4 +211,62 @@ Data
   success: BOOLEAN
   err   ?: STRING
   users ?: ARRAY<OBJECT>
+```
+
+### Leaving a room
+
+**`leave`** (client emission)
+
+```plainext
+Data
+  (none required)
+```
+
+**`leave.response`** (server emission)
+
+```plaintext
+Data
+  success: BOOLEAN
+  err   ?: STRING
+```
+
+### In-Room Events
+
+**`newMessage`** (client emission)
+
+```plaintext
+Data
+  message: STRING
+```
+
+**`newMessage.response`** (server emission)
+
+```plaintext
+Data
+  success: BOOLEAN
+  err   ?: STRING
+```
+
+When connected to a socket room, a client also needs to know when other clients connect, disconnect, and post a new message from the same room. These events will be useful for that:
+
+**`user message`** (server emission)
+
+```plaintext
+DATA
+  message: STRING
+  user   : OBJECT
+```
+
+**`user connect`** (server emission)
+
+```plaintext
+DATA
+  user: OBJECT
+```
+
+**`user leave`** (server emission)
+
+```plaintext
+DATA
+  user: OBJECT
 ```

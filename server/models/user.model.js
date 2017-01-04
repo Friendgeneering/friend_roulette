@@ -82,6 +82,7 @@ const User = sequelize.define('users', {
   // instanceMethods are convenient for giving our model instances common tasks
   instanceMethods: {
     /**
+     *
      *  checkPassword: Promise<boolean>
      *
      *  comparePassword is a promisifed version of the bcrypt.compare function

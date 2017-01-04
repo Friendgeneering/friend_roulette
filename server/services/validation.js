@@ -1,3 +1,27 @@
+import { Room } from '../models';
+
+/**
+ *
+ *  roomExists @return Promise<Boolean>
+ *
+ *  Validation for checking if a requested roomId exists
+ *
+ *  @param {OBJECT} req - express request object
+ *  @param {OBJECT} res - express resopnse object
+ *  @param {INT}    roomId
+ */
+export const roomExists = async (req, res, roomId) => {
+  const room = await Room.findById(roomId);
+  if (!room) {
+    res.status(400).json({
+      success: false,
+      err    : 'room does not exist',
+    });
+    return false;
+  }
+  return true;
+};
+
 /**
  *
  *  isRequestInvalid: @return Promise<Boolean>
@@ -8,10 +32,19 @@
  *  @param {OBJECT} res - express resopnse object
  */
 export const isRequestInvalid = async (req, res) => {
-  const result = await req.getValidationResult();
-  if (!result.isEmpty()) {
-    res.status(400).json({
-      err: result.mapped(),
+  try {
+    const result = await req.getValidationResult();
+    if (!result.isEmpty()) {
+      res.status(400).json({
+        err: result.mapped(),
+      });
+      return true;
+    }
+  } catch (e) {
+    console.log(e);
+    res.status(500).json({
+      success: false,
+      err    : e.toString(),
     });
     return true;
   }
