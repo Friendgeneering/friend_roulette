@@ -100,6 +100,7 @@ export const fetchAllRooms = async (req, res) => {
  *  }
  */
 export const fetchOrCreateRoom = async (req, res) => {
+  console.log('in req', req.body);
   req.checkBody('location', 'provide a location').notEmpty().isAscii();
   req.checkBody('gender', 'provide a gender: \'male\', \'female\', or \'any\'').notEmpty().isGender();
   req.checkBody('minAge', 'provide a minimum age').notEmpty().isInt();

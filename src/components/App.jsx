@@ -3,7 +3,8 @@ import { browserHistory, Router, Route } from 'react-router'
 
 
 import { auth } from '../containers/auth'
-import { main } from './dashboard'
+import { main } from '../containers/dashboard'
+import Profile from './base/profile'
 
 class App extends Component {
   render() {
@@ -12,6 +13,7 @@ class App extends Component {
       <Router history={browserHistory}>
         <Route path='/' component={auth.Login} />
         <Route path='dashboard' component={requireAuthentication(main.Dashboard)} />
+        <Route path='/profile/:id' component={Profile} />
       </Router>
     );
   }
