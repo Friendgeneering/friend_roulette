@@ -3,7 +3,7 @@ import { browserHistory, Router, Route } from 'react-router'
 
 
 import { auth } from '../containers/auth'
-import { main } from './dashboard'
+import { main } from '../containers/dashboard'
 import Profile from './base/profile'
 
 class App extends Component {

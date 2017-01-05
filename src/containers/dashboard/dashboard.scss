@@ -1,0 +1,17 @@
+.sidebar-container {
+	height: 92vh;
+	width: 20%;
+	border: 1px solid black;
+}
+
+.dashboard-container {
+	display: flex;
+	flex-direction: row;
+}
+
+.chat-container {
+	border: 1px solid black;
+	height: 90vh;
+	width: 60%;
+	background: #e5e5e5;
+}

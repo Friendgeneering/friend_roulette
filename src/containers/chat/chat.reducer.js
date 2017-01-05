@@ -1,4 +1,4 @@
-import { FIND_CHAT } from './chat.actions'
+import { FIND_CHAT, FETCH_USER_ROOMS } from './chat.actions'
 
 const INITIAL_STATE = { 
 	userChats: [], 
@@ -16,6 +16,13 @@ export default function(state = INITIAL_STATE, action) {
 			let temp = {}
 			temp.query = { newRoom: data.newRoom, chatResults: data.room}
 			temp.success = true
+			return {...state, ...temp}
+		}
+		case FETCH_USER_ROOMS: {
+			const { data } = action.payload
+			let temp = {}
+			temp.success = true
+			temp.userChats = [...data.rooms]
 			return {...state, ...temp}
 		}
 
